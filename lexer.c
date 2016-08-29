@@ -46,11 +46,20 @@ int is_decimal(FILE *dish)
   int i = 0;
   if (isdigit (lexeme[0] = getc(dish))) {
     if (lexeme[0] == '0') {
-      lexeme[1] = 0;
-      return DEC;
+      if( (lexeme[1] = getc(dish)) == '0' ) {
+        return DEC;
+      } else {
+        ungetc (lexeme[1], dish);
+        ungetc (lexeme[0], dish);
+        return 0;
+      }
     }
     // [0-9]*
     for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
+    if(lexeme[i] == '.') { //for later float verification
+      ungetc (lexeme[i], dish);
+      return 0;
+    }
     ungetc (lexeme[i], dish);
     lexeme[i] = 0;
     return DEC;
@@ -64,8 +73,13 @@ int is_octal(FILE *dish)
   int octpref = getc(dish);
   if (octpref == '0') {
     int cake = getc(dish);
-    if ( cake >= '0' && cake <= '7') {
-      while ( (cake = getc(dish)) >= '0' && cake <= '7');
+    if ( cake >= '0' && cake <= '7' && cake != '.') {
+      while ( (cake = getc(dish)) >= '0' && cake <= '7' && cake != '.');
+      if(cake == '.') {
+        ungetc (cake, dish);
+        ungetc (octpref, dish);
+        return 0;
+      }
       ungetc (cake, dish);
       return OCTAL;
     } else {
@@ -188,13 +202,13 @@ int gettoken (FILE *tokenstream)
   if (token)
     return OCTAL;
 
-  token = is_float(tokenstream);
-  if (token)
-    return FLOAT;
-
   token = is_decimal (tokenstream);
   if (token)
     return DEC;
+
+  token = is_float(tokenstream);
+  if (token)
+    return FLOAT;
 
   token = is_identifier(tokenstream);
   if (token)
