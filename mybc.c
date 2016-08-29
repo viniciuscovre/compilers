@@ -27,6 +27,8 @@ main (int argc, char *argv[], char *envp[])
 
         lookahead = gettoken (source);
 
+        // init();
+
         expr ();
 
         printf("\n");

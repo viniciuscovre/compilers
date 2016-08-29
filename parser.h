@@ -16,3 +16,4 @@ void quoc (void);
 void fact (void);
 int addop (void);
 int mulop (void);
+void init (void);
