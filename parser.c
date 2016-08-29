@@ -70,7 +70,7 @@ void expr (void)
   term();
   /**/if(neg){ printf("<+/-> "); }/**/
 
-  while( op = addop() ) {
+  while( (op = addop()) ) {
     /**/printf("<enter> ")/**/;
     term();
     /**/printf("expr:op<%c> ",op)/**/;
@@ -84,7 +84,7 @@ void term (void)
 {
   /**/int op/**/;
   fact();
-  while( op = mulop() )
+  while( (op = mulop()) )
   {
     /**/printf("<enter> ")/**/;
     fact();
@@ -157,7 +157,10 @@ void fact (void)
     match (HEX);
     break;
 
-    //  case PONTO FLUTUANTE
+    case FLOAT:
+    /**/printf("float ")/**/;
+    match (FLOAT);
+    break;
 
     case OCTAL:
     /**/printf("octal ")/**/;
@@ -220,20 +223,24 @@ double operation(int op, int operando1, int operando2)
 
   double result;
 
-  printf("Op: %d, op1: %d, op2: %d\n",op,op,operando1,operando2);
+  printf("Op: %d, op1: %d, op2: %d\n",op,operando1,operando2);
   switch(op){
+    
     case '+':
     result = (double) (operando1 + operando2);
     return result;
     break;
+
     case '-':
     result = (double) (operando1 - operando2);
     return result;
     break;
+
     case '*':
     result = (double) (operando1 * operando2);
     return result;
     break;
+
     case '/':
     if(operando2 == 0){
       printf("ERROR, DIVISION 0");
@@ -247,6 +254,7 @@ double operation(int op, int operando1, int operando2)
     printf("ERROR - COMMAND NOT VALID");
     break;
   }
+  return 0;
 }
 /*Funcao para debug e estetica. Printa a tabela de memoria ~William*/
 void printa_tabela()

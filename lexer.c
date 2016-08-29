@@ -114,9 +114,65 @@ int is_hexadecimal(FILE *dish)
   return 0;
 }
 
-/* int is_float(FILE *dish)
+int is_float(FILE *dish)
 {
+  int i = 0;
+  lexeme[0] = getc(dish);
+  if (isdigit(lexeme[i]) || lexeme[i] == '.') {
+    if (lexeme[i] == '.') {
+      if ( isdigit((lexeme[++i] = getc(dish))) ) {
+        if ( tolower((lexeme[++i] = getc(dish))) == 'e') {
+          //verif exp
+        }
+        while( isdigit(lexeme[++i] = getc(dish)) );
+        if ( (tolower(lexeme[i])) == 'e') {
+          //verif exp
+        }
+        ungetc (lexeme[i], dish);
+        return FLOAT;
+      }
+      ungetc (lexeme[i], dish);
+      return 0;
+    } else {
+      for (i++; isdigit(lexeme[i] = getc(dish)); i++);
+      if(lexeme[i] == '.') {
+        if ( isdigit((lexeme[++i] = getc(dish))) ) {
+          if ( tolower((lexeme[++i] = getc(dish))) == 'e') {
+            //verif exp
+          }
+          ungetc (lexeme[i], dish);
+          while( isdigit(lexeme[++i] = getc(dish)) );
+          if ( (tolower(lexeme[i])) == 'e') {
+            //verif exp
+          }
+          ungetc (lexeme[i], dish);
+          return FLOAT;
+      }
+      ungetc (lexeme[i], dish);
+      return 0;
+      }
+    }
+  }
+  ungetc (lexeme[i], dish);
+  return 0;
+}
 
+/* int is_decimal(FILE *dish)
+{
+  int i = 0;
+  if (isdigit (lexeme[0] = getc(dish))) {
+    if (lexeme[0] == '0') {
+      lexeme[1] = 0;
+      return DEC;
+    }
+    // [0-9]*
+    for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
+    ungetc (lexeme[i], dish);
+    lexeme[i] = 0;
+    return DEC;
+  }
+  ungetc (lexeme[0], dish);
+  return 0;
 } */
 
 int gettoken (FILE *tokenstream)
@@ -126,19 +182,23 @@ int gettoken (FILE *tokenstream)
 
   token = is_hexadecimal (tokenstream);
   if (token)
-  return HEX;
+    return HEX;
 
   token = is_octal(tokenstream);
   if (token)
-  return OCTAL;
+    return OCTAL;
+
+  token = is_float(tokenstream);
+  if (token)
+    return FLOAT;
 
   token = is_decimal (tokenstream);
   if (token)
-  return DEC;
+    return DEC;
 
   token = is_identifier(tokenstream);
   if (token)
-  return ID;
+    return ID;
 
   token = getc (tokenstream);
   return token;

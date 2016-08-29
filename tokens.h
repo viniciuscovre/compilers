@@ -5,6 +5,7 @@ enum {
 	DEC,
 	OCTAL,
 	HEX,
+	FLOAT,
 };
 
 enum {
