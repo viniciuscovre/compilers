@@ -135,12 +135,35 @@ int is_float(FILE *dish)
   if (isdigit(lexeme[i]) || lexeme[i] == '.') {
     if (lexeme[i] == '.') {
       if ( isdigit((lexeme[++i] = getc(dish))) ) {
-        if ( tolower((lexeme[++i] = getc(dish))) == 'e') {
-          //verif exp
-        }
-        while( isdigit(lexeme[++i] = getc(dish)) );
-        if ( (tolower(lexeme[i])) == 'e') {
-          //verif exp
+        while( isdigit(lexeme[++i]=getc(dish)) );
+        if ( tolower(lexeme[i]) == 'e') { //VERIFYING EXP
+          lexeme[++i] = getc(dish);
+          if(!isdigit(lexeme[i]) && lexeme[i] != '-' && lexeme[i] != '+') {
+            //for(; i<=0; i--) //giving all read elements back to file
+            ungetc (lexeme[i], dish);
+            return 0;
+          }
+          if( lexeme[i] == '+' || lexeme[i] == '-' || isdigit(lexeme[i]) ) {
+            if( !isdigit(lexeme[++i] = getc(dish)) ) {
+              //ungetc (lexeme[i+1], dish); //giving all read elements back to file
+              //for(; i<=0; i--) //continue giving all read elements back to file
+              ungetc (lexeme[i], dish);
+              return 0;
+            }
+            // ungetc (lexeme[i], dish); // due to the closest 'if' (above)
+            while( isdigit(lexeme[++i]=getc(dish)) );
+            if (isdigit(lexeme[i-1])) {
+              ungetc (lexeme[i], dish);
+              return FLOAT;
+            } else {
+              //for(; i<=0; i--) //giving all read elements back to file
+              ungetc (lexeme[i], dish);
+              return 0;
+            }
+          } else {
+            ungetc (lexeme[i], dish);
+            return FLOAT;
+          }
         }
         ungetc (lexeme[i], dish);
         return FLOAT;
@@ -150,20 +173,32 @@ int is_float(FILE *dish)
     } else {
       for (i++; isdigit(lexeme[i] = getc(dish)); i++);
       if(lexeme[i] == '.') {
-        if ( isdigit((lexeme[++i] = getc(dish))) ) {
-          if ( tolower((lexeme[++i] = getc(dish))) == 'e') {
-            //verif exp
-          }
-          ungetc (lexeme[i], dish);
-          while( isdigit(lexeme[++i] = getc(dish)) );
-          if ( (tolower(lexeme[i])) == 'e') {
-            //verif exp
-          }
+        while( isdigit(lexeme[++i]=getc(dish)) );
+        if (isdigit(lexeme[i])) {
           ungetc (lexeme[i], dish);
           return FLOAT;
-      }
-      ungetc (lexeme[i], dish);
-      return 0;
+        }
+        if ( tolower(lexeme[i]) == 'e') {
+          while( isdigit(lexeme[++i]=getc(dish)) );
+          if(isdigit(lexeme[i])) {
+            ungetc (lexeme[i], dish);
+            return FLOAT;
+          }
+          if(lexeme[i] == '-' || lexeme[i] == '+') {
+            while( isdigit(lexeme[++i]=getc(dish)) );
+            if (!isdigit(lexeme[i])) {
+              ungetc (lexeme[i], dish);
+              return 0;
+            }
+            ungetc (lexeme[i], dish);
+            return FLOAT;
+          } else {
+            ungetc (lexeme[i], dish);
+            return 0;
+          }
+        }
+        ungetc (lexeme[i], dish);
+        return 0;
       }
     }
   }
@@ -173,20 +208,20 @@ int is_float(FILE *dish)
 
 /* int is_decimal(FILE *dish)
 {
-  int i = 0;
-  if (isdigit (lexeme[0] = getc(dish))) {
-    if (lexeme[0] == '0') {
-      lexeme[1] = 0;
-      return DEC;
-    }
-    // [0-9]*
-    for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
-    ungetc (lexeme[i], dish);
-    lexeme[i] = 0;
-    return DEC;
-  }
-  ungetc (lexeme[0], dish);
-  return 0;
+int i = 0;
+if (isdigit (lexeme[0] = getc(dish))) {
+if (lexeme[0] == '0') {
+lexeme[1] = 0;
+return DEC;
+}
+// [0-9]*
+for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
+ungetc (lexeme[i], dish);
+lexeme[i] = 0;
+return DEC;
+}
+ungetc (lexeme[0], dish);
+return 0;
 } */
 
 int gettoken (FILE *tokenstream)
@@ -194,25 +229,25 @@ int gettoken (FILE *tokenstream)
   int token;
   skipspaces (tokenstream);
 
+  token = is_identifier(tokenstream);
+  if (token)
+  return ID;
+
   token = is_hexadecimal (tokenstream);
   if (token)
-    return HEX;
+  return HEX;
 
   token = is_octal(tokenstream);
   if (token)
-    return OCTAL;
+  return OCTAL;
 
   token = is_decimal (tokenstream);
   if (token)
-    return DEC;
+  return DEC;
 
   token = is_float(tokenstream);
   if (token)
-    return FLOAT;
-
-  token = is_identifier(tokenstream);
-  if (token)
-    return ID;
+  return FLOAT;
 
   token = getc (tokenstream);
   return token;
