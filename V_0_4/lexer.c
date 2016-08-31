@@ -73,11 +73,11 @@ int gettoken (FILE *tokenstream)
 
         skipspaces (tokenstream);
 
-        if ( token = is_identifier(tokenstream) ) {
+        if ( (token = is_identifier(tokenstream)) ) {
                 return ID;
         }
 
-        if ( token = is_decimal (tokenstream) ) {
+        if ( (token = is_decimal (tokenstream)) ) {
                 return DEC;
         }
 

@@ -30,14 +30,21 @@ main (int argc, char *argv[], char *envp[])
         expr ();
 
 	match(EOF);
-	printf("lookahead:%d fora\n",lookahead);
+
+  // Just to print quantity of parenthesis error
+  unsigned int quantity;
+  quantity = checa_parenteses;
+  quantity = (checa_parenteses >= 0 ? checa_parenteses : -checa_parenteses);
+
 	if(lookahead==EOF)
 	{
-	printf("dentro\n");
 		if (checa_parenteses!=0)
-		{
-		printf("Erro!\n");
-		}	
+      printf("Error! ");
+
+    if (checa_parenteses < 0)
+      printf("Missing %d left parenthesis '('\n", quantity);
+    else if (checa_parenteses > 0)
+      printf("Missing %d right parenthesis ')'\n", quantity);
 	}
-        exit (0);
+  exit (0);
 }
