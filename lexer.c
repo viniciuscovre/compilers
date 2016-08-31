@@ -162,7 +162,7 @@ int is_float(FILE *dish)
           }
           if(isdigit(lexeme[i])) {
             while( isdigit(lexeme[++i]=getc(dish)) );
-            if (isdigit(lexeme[i])) {
+            if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOT) {
               ungetc (lexeme[i], dish);
               return FLOAT;
             }
