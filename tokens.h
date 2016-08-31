@@ -14,3 +14,7 @@ enum {
 	STACK_OVERFLOW_ERR = -66,
 	PUSH_ERR = -67,
 };
+
+enum {
+	EOT = 10, //END OF TRANSMISSION
+};
