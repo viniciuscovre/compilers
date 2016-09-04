@@ -62,6 +62,24 @@ int parentheses_check;
 */
 void expr (void)
 {
+  /**/int op, neg = 0 /**/;
+  if(lookahead == '-'){
+    match('-');
+    /**/neg = '-';/**/
+  }
+
+  term();
+  /**/if(neg){ printf("<+/-> "); }/**/
+
+  while( (op = addop()) ) {
+    /**/printf("<enter> ")/**/;
+    term();
+    /**/printf("expr:op<%c> ",op)/**/;
+    push(op);
+  }
+}
+/*void expr (void)
+{
 	E_entry:
 	T_entry:
 	F_entry:
@@ -97,7 +115,8 @@ void expr (void)
 			goto E_entry;
 		}
 	}
-}
+}*/
+
 /*
 * term -> fact { mulop fact } || term.pf := fact.pf { fact.pf mulop.pf }
 */
@@ -412,5 +431,25 @@ void match (int expected)
     fprintf(stderr,"whereas expected # %d\n",
     expected);
     exit (SYNTAX_ERR);
+  }
+}
+
+void parenthesis_control(void)
+{
+  // Just to print quantity of parenthesis error
+  //MOVE TO A FUNCTION
+  unsigned int quantity;
+  quantity = parentheses_check;
+  quantity = (parentheses_check >= 0 ? parentheses_check : -parentheses_check);
+
+  if(lookahead==EOF)
+  {
+    if (parentheses_check!=0)
+    printf("Error! ");
+
+    if (parentheses_check < 0)
+    printf("Missing %d left parenthesis '('\n", quantity);
+    else if (parentheses_check > 0)
+    printf("Missing %d right parenthesis ')'\n", quantity);
   }
 }

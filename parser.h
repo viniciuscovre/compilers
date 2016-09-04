@@ -17,3 +17,5 @@ void fact (void);
 int addop (void);
 int mulop (void);
 void init (void);
+
+void parenthesis_control(void);
