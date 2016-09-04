@@ -194,7 +194,7 @@ void fact (void)
 
     case HEX:
     /**/printf("hexadecimal ")/**/;
-	push(convertHexToInt(lexeme));
+	  push(convertHexToInt(lexeme));
     match (HEX);
     break;
 
@@ -205,7 +205,7 @@ void fact (void)
 
     case OCTAL:
     /**/printf("octal ")/**/;
-	push(convertHexToInt(lexeme));
+	  push(convertHexToInt(lexeme));
     match (OCTAL);
     break;
 
@@ -234,7 +234,7 @@ memtab[i] = operation(operador,operando1,operando2);
 Os erros mencionados aqui ja estao em tokens.h, porem ainda nao tem uso real ~William*/
 void push(int op)//op pode ser operador ou operando
 {
-  printf("pop\n");
+  printf("push\n");
   if(sp>=MAXSTACK_SIZE)
   printf("ERROR:STACK OVERFLOW\n");
   else
@@ -246,7 +246,7 @@ void push(int op)//op pode ser operador ou operando
 
 double pop()
 {
-  printf("push\n");
+  printf("pop\n");
   if(sp<=-1)
   {
     printf("ERROR:PUSH ON EMPTY LIST\n");
