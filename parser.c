@@ -144,7 +144,7 @@ void fact (void)
     break;
 
     case DEC:
-    /**/printf("dec:%s ", lexeme)/**/;
+    /**/printf("decimal:%s ", lexeme)/**/;
     /*Atoi eh necessario para inclusao na pilha ~William*/
     printf("atoi %d\n",atoi(lexeme));
     push(atoi(lexeme));
@@ -154,6 +154,7 @@ void fact (void)
 
     case HEX:
     /**/printf("hexadecimal ")/**/;
+	push(convertHexToInt(lexeme));
     match (HEX);
     break;
 
@@ -164,6 +165,7 @@ void fact (void)
 
     case OCTAL:
     /**/printf("octal ")/**/;
+	push(convertHexToInt(lexeme));
     match (OCTAL);
     break;
 
@@ -293,6 +295,48 @@ int is_available(){
   return -1;
 }
 
+int convertOctaToInt(char octalToConvert[]){
+	
+	int n = atoi(octalToConvert);
+	int rem, i=1, octal=0;
+    while (n!=0)
+    {
+        rem=n%8;
+        n/=8;
+        octal+=rem*i;
+        i*=10;
+    }
+    printf("Result: %d", octal);
+    return octal;
+	
+}
+
+int convertHexToInt(char hexaToConvert[]){
+    int n,i;
+    n=0;
+    
+    for(i=0; hexaToConvert[i]!='\n' && hexaToConvert[i]!=0 ; i++){
+            if(hexaToConvert[i]>='0' && hexaToConvert[i]<='9')
+                n=n*16+(hexaToConvert[i]-'0');
+            else if(hexaToConvert[i]=='A' || hexaToConvert[i]=='a')
+                n=n*16+(10);
+            else if(hexaToConvert[i]=='B' || hexaToConvert[i]=='b')
+                n=n*16+(11);
+            else if(hexaToConvert[i]=='C' || hexaToConvert[i]=='c')
+                n=n*16+(12);
+            else if(hexaToConvert[i]=='D' || hexaToConvert[i]=='d')
+                n=n*16+(13);
+            else if(hexaToConvert[i]=='E' || hexaToConvert[i]=='e')
+                n=n*16+(14);
+            else if(hexaToConvert[i]=='F' || hexaToConvert[i]=='f')
+                n=n*16+(15);
+            else{
+                printf("Error:Your number Is Not Valid!");
+                return -1;
+            }       
+    }
+    //printf("%d",n);
+}
 void init(){
   int i = 0;
   while( i< MAXSYMTAB_SIZE){
