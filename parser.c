@@ -23,6 +23,7 @@ void printa_tabela();
 void printa_pilha();
 double pop();
 void push(int op);
+int parentheses_check;
 
 /*************************** LL(1) grammar definition ******************************
 *
@@ -61,21 +62,41 @@ void push(int op);
 */
 void expr (void)
 {
-  /**/int op, neg = 0 /**/;
-  if(lookahead == '-'){
-    match('-');
-    /**/neg = '-';/**/
-  }
+	E_entry:
+	T_entry:
+	F_entry:
+	switch (lookahead)
+	{
+		case ID:
+			match (ID);
+			break;
 
-  term();
-  /**/if(neg){ printf("<+/-> "); }/**/
+		case DEC:
+			match (DEC);
+			break;
 
-  while( (op = addop()) ) {
-    /**/printf("<enter> ")/**/;
-    term();
-    /**/printf("expr:op<%c> ",op)/**/;
-    push(op);
-  }
+		default:
+			break;
+	}
+	if(mulop())
+		goto F_entry;
+	else if(addop())
+		goto T_entry;
+	else
+	{
+		if(lookahead=='(')
+		{
+			match ('(');
+			parentheses_check++;
+			goto E_entry;
+		}
+		if(lookahead==')')
+		{	//printf("look:%d",lookahead);
+			match (')');
+			parentheses_check--;
+			goto E_entry;
+		}
+	}
 }
 /*
 * term -> fact { mulop fact } || term.pf := fact.pf { fact.pf mulop.pf }
@@ -227,7 +248,7 @@ double operation(int op, int operando1, int operando2)
 
   printf("Op: %d, op1: %d, op2: %d\n",op,operando1,operando2);
   switch(op){
-    
+
     case '+':
     result = (double) (operando1 + operando2);
     return result;
@@ -296,7 +317,7 @@ int is_available(){
 }
 
 int convertOctaToInt(char octalToConvert[]){
-	
+
 	int n = atoi(octalToConvert);
 	int rem, i=1, octal=0;
     while (n!=0)
@@ -308,13 +329,13 @@ int convertOctaToInt(char octalToConvert[]){
     }
     printf("Result: %d", octal);
     return octal;
-	
+
 }
 
 int convertHexToInt(char hexaToConvert[]){
     int n,i;
     n=0;
-    
+
     for(i=0; hexaToConvert[i]!='\n' && hexaToConvert[i]!=0 ; i++){
             if(hexaToConvert[i]>='0' && hexaToConvert[i]<='9')
                 n=n*16+(hexaToConvert[i]-'0');
@@ -333,7 +354,7 @@ int convertHexToInt(char hexaToConvert[]){
             else{
                 printf("Error:Your number Is Not Valid!");
                 return -1;
-            }       
+            }
     }
     //printf("%d",n);
 }

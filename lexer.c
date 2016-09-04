@@ -4,8 +4,6 @@
 
 TODO: ALTERAR TODOS OS METODOS PARA UTILIZAR O LEXEME, PARA O PARSER.C IMPRIMIR O VALOR
 
-TODO: ADICIONAR CODIGO NO IS_FLOAT
-
 */
 
 #include <stdio.h>
@@ -264,24 +262,6 @@ int is_float(FILE *dish)
   ungetc (lexeme[i], dish);
   return 0;
 }
-
-/* int is_decimal(FILE *dish)
-{
-int i = 0;
-if (isdigit (lexeme[0] = getc(dish))) {
-if (lexeme[0] == '0') {
-lexeme[1] = 0;
-return DEC;
-}
-// [0-9]*
-for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
-ungetc (lexeme[i], dish);
-lexeme[i] = 0;
-return DEC;
-}
-ungetc (lexeme[0], dish);
-return 0;
-} */
 
 int gettoken (FILE *tokenstream)
 {
