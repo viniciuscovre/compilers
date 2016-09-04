@@ -10,7 +10,7 @@
 FILE *source;
 
 extern int lookahead; // @ parser.c
-extern int checa_parenteses = 0;
+extern int parentheses_check = 0;
 
 main (int argc, char *argv[], char *envp[])
 {
@@ -33,17 +33,17 @@ main (int argc, char *argv[], char *envp[])
 
   // Just to print quantity of parenthesis error
   unsigned int quantity;
-  quantity = checa_parenteses;
-  quantity = (checa_parenteses >= 0 ? checa_parenteses : -checa_parenteses);
+  quantity = parentheses_check;
+  quantity = (parentheses_check >= 0 ? parentheses_check : -parentheses_check);
 
 	if(lookahead==EOF)
 	{
-		if (checa_parenteses!=0)
+		if (parentheses_check!=0)
       printf("Error! ");
 
-    if (checa_parenteses < 0)
+    if (parentheses_check < 0)
       printf("Missing %d left parenthesis '('\n", quantity);
-    else if (checa_parenteses > 0)
+    else if (parentheses_check > 0)
       printf("Missing %d right parenthesis ')'\n", quantity);
 	}
   exit (0);

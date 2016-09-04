@@ -5,7 +5,7 @@
 #include <tokens.h>
 #include <parser.h>
 
-int checa_parenteses;
+int parentheses_check;
 /*************************** LL(1) grammar definition ******************************
 *
 * expr -> term {addop term}
@@ -34,7 +34,7 @@ int checa_parenteses;
 
 
 void expr (void)
-{//(3+4))*5
+{
 	E_entry:
 	T_entry:
 	F_entry:
@@ -60,13 +60,13 @@ void expr (void)
 		if(lookahead=='(')
 		{
 			match ('(');
-			checa_parenteses++;
+			parentheses_check++;
 			goto E_entry;
 		}
 		if(lookahead==')')
 		{	//printf("look:%d",lookahead);
 			match (')');
-			checa_parenteses--;
+			parentheses_check--;
 			goto E_entry;
 		}
 	}
