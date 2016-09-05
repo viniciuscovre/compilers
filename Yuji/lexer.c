@@ -54,8 +54,9 @@ int is_decimal(FILE *dish)
     }
     // [0-9]*
     for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
-    if(lexeme[i] == '.') { //for later float verification
+    if(lexeme[i-1] == '.') { //for later float verification
       ungetc (lexeme[i], dish);
+      ungetc(lexeme[i-1], dish);
       return 0;
     }
     ungetc (lexeme[i], dish);

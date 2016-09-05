@@ -6,6 +6,7 @@
 #include <parser.h>
 #include <lexer.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAXSYMTAB_SIZE	0x10000
 int symtab_nextentry = 0;
@@ -148,15 +149,21 @@ void fact (void)
   int i = -1, a=0;
   switch (lookahead)
   {
+    
+    int cont_variables_set = 1;
+    
+    ID_ENTRY:
+    
     case ID:
     strcpy(bkplexeme, lexeme);
     match (ID);
+    printf("ID ENCONTRADO: %s",lexeme);
 
     if(lookahead == '=') {
       match('=');
-      expr();
-      /**/printf("%s:<store> ",bkplexeme);/**/
+      
       i = is_available();
+      
 
       if(i == -1) {
         printf("ERROR:ALOCATION_ERR\n");
@@ -165,19 +172,36 @@ void fact (void)
 
       strcpy(symtab[i],bkplexeme);
       tab_aux[i] = 1;
-
-      /*Parte Operation: essa parte vai ser removida ou modificada no futuro pra abranger todo os casos de operacao,
-      por enquanto apenas resolve operacoes do tipo numero + numero ~William*/
-      if(sp > 1) {
-        operador = pop();
-        operando2 = pop();
-        operando1 = pop();
-        printf("Operador: %d, op1: %d, op2: %d\n",operador,operando1,operando2);
-        memtab[i] = operation(operador,operando1,operando2);
+      
+      
+      double valor_setado;
+      if(isdigit(lexeme)){
+	if(sp > 1) {
+	  operador = pop();
+	  operando2 = pop();
+	  operando1 = pop();
+	  printf("Operador: %d, op1: %d, op2: %d\n",operador,operando1,operando2);
+	  memtab[i] = operation(operador,operando1,operando2);
+	}else{
+	  memtab[i] = atoi(lexeme);
+	  valor_setado = atoi(lexeme);
+	  
+	}
+	
+	int n;
+	for(n = 1; n < cont_variables_set; n++){
+	  memtab[i-n] = valor_setado;
+	  
+	}
+	
+      } else{
+	cont_variables_set++;
+	goto ID_ENTRY;
       }
-      /*Fim da parte Operation*/
 
       printa_tabela();
+      
+      
     } else
     /**/printf("id:%s ",bkplexeme);/**/
 
@@ -194,7 +218,7 @@ void fact (void)
 
     case HEX:
     /**/printf("hexadecimal ")/**/;
-	push(convertHexToInt(lexeme));
+	  push(convertHexToInt(lexeme));
     match (HEX);
     break;
 
@@ -205,7 +229,7 @@ void fact (void)
 
     case OCTAL:
     /**/printf("octal ")/**/;
-	push(convertHexToInt(lexeme));
+	  push(convertHexToInt(lexeme));
     match (OCTAL);
     break;
 
@@ -234,7 +258,7 @@ memtab[i] = operation(operador,operando1,operando2);
 Os erros mencionados aqui ja estao em tokens.h, porem ainda nao tem uso real ~William*/
 void push(int op)//op pode ser operador ou operando
 {
-  printf("pop\n");
+  printf("push\n");
   if(sp>=MAXSTACK_SIZE)
   printf("ERROR:STACK OVERFLOW\n");
   else
@@ -246,7 +270,7 @@ void push(int op)//op pode ser operador ou operando
 
 double pop()
 {
-  printf("push\n");
+  printf("pop\n");
   if(sp<=-1)
   {
     printf("ERROR:PUSH ON EMPTY LIST\n");
