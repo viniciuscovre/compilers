@@ -183,6 +183,12 @@ void fact (void)
 
     break;
 
+    case HEX:
+    /**/printf("hexadecimal ")/**/;
+    push(convertHexToInt(lexeme));
+    match (HEX);
+    break;
+
     case DEC:
     /**/printf("decimal:%s ", lexeme)/**/;
     /*Atoi eh necessario para inclusao na pilha ~William*/
@@ -190,12 +196,6 @@ void fact (void)
     push(atoi(lexeme));
     /*Fim da inclusao  de DEC na pilha~William*/
     match (DEC);
-    break;
-
-    case HEX:
-    /**/printf("hexadecimal ")/**/;
-	  push(convertHexToInt(lexeme));
-    match (HEX);
     break;
 
     case FLOAT:
