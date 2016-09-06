@@ -8,6 +8,8 @@ extern FILE *source; // @ main.c
 
 extern void match (int); // @ local
 
+extern void printa_tabela();
+
 /* syntax names */
 void expr (void);
 void rest (void);
