@@ -33,29 +33,35 @@ int is_identifier(FILE *dish)
     lexeme[i] = 0;
     return ID;
   }
-  if (lexeme[MAXID_SIZE] != 0) { //Verifying maximum size of the id
+  if (lexeme[MAXID_SIZE] != 0) { //Verifying maximum size of the id ~vina
     lexeme[MAXID_SIZE] = 0;
   }
   ungetc (lexeme[i], dish);
   return 0;
 }
 
+int i = 0; //making i global to use in is_float verification ~vina
 int is_decimal(FILE *dish)
 {
-  int i = 0;
-  if (isdigit (lexeme[0] = getc(dish))) {
-    if (lexeme[0] == '0') {
-      if( (lexeme[1] = getc(dish)) == '0' ) {
+  // int i = 0;
+  if (isdigit (lexeme[i] = getc(dish))) {
+    if (lexeme[i] == '0') {
+      if( (lexeme[++i] = getc(dish)) == '0' || lexeme[i] == EOF || lexeme[i] == EOT ) {
+        ungetc (lexeme[i], dish);
         return DEC;
+      } else if (lexeme[i] == '.' || tolower(lexeme[i]) == 'e') {
+        //for later float verification ~vina
+        ungetc (lexeme[i], dish);
+        return 0;
       } else {
-        ungetc (lexeme[1], dish);
-        ungetc (lexeme[0], dish);
+        ungetc (lexeme[i], dish);
+        ungetc (lexeme[i-1], dish);
         return 0;
       }
     }
     // [0-9]*
     for (i=1; isdigit (lexeme[i] = getc(dish)); i++);
-    if(lexeme[i] == '.' || tolower(lexeme[i]) == 'e') { //for later float verification
+    if(lexeme[i] == '.' || tolower(lexeme[i]) == 'e') { //for later float verification ~vina
       ungetc (lexeme[i], dish);
       return 0;
     }
@@ -63,7 +69,7 @@ int is_decimal(FILE *dish)
     lexeme[i] = 0;
     return DEC;
   }
-  ungetc (lexeme[0], dish);
+  ungetc (lexeme[i], dish);
   return 0;
 }
 
@@ -130,13 +136,13 @@ int is_hexadecimal(FILE *dish)
 
 int is_float(FILE *dish)
 {
-  int i = 0;
+  // int i = 0;
   lexeme[i] = getc(dish);
   if (tolower(lexeme[i]) == 'e' || lexeme[i] == '.') {
     if (lexeme[i] == '.') {
       if ( isdigit((lexeme[++i] = getc(dish))) ) {
         while( isdigit(lexeme[++i]=getc(dish)) );
-        if ( tolower(lexeme[i]) == 'e') { //VERIFYING EXP
+        if ( tolower(lexeme[i]) == 'e') { //VERIFYING EXP ~vina
           lexeme[++i] = getc(dish);
           // if(!isdigit(lexeme[i]) && lexeme[i] != '-' && lexeme[i] != '+' && lexeme[i] != EOF && lexeme[i] != EOT) {
           //   ungetc (lexeme[i], dish);
@@ -181,7 +187,7 @@ int is_float(FILE *dish)
       }
       ungetc (lexeme[i], dish);
       return 0;
-    } else { // (decimal ...) 'e' something
+    } else { // (decimal ...) 'e' something ~vina
     lexeme[++i] = getc(dish);
     if(lexeme[i] == EOF || lexeme[i] == EOT) {
       ungetc(lexeme[i], dish);
@@ -225,7 +231,7 @@ int gettoken (FILE *tokenstream)
 
   token = is_float(tokenstream);
   if (token)
-  return FLOAT;
+  return token;
 
   token = getc (tokenstream);
   return token;

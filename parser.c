@@ -6,6 +6,7 @@
 #include <parser.h>
 #include <lexer.h>
 #include <string.h>
+#include <ctype.h>
 
 #define MAXSYMTAB_SIZE	0x10000
 int symtab_nextentry = 0;
@@ -80,41 +81,41 @@ void expr (void)
 }
 /*void expr (void)
 {
-	E_entry:
-	T_entry:
-	F_entry:
-	switch (lookahead)
-	{
-		case ID:
-			match (ID);
-			break;
+E_entry:
+T_entry:
+F_entry:
+switch (lookahead)
+{
+case ID:
+match (ID);
+break;
 
-		case DEC:
-			match (DEC);
-			break;
+case DEC:
+match (DEC);
+break;
 
-		default:
-			break;
-	}
-	if(mulop())
-		goto F_entry;
-	else if(addop())
-		goto T_entry;
-	else
-	{
-		if(lookahead=='(')
-		{
-			match ('(');
-			parentheses_check++;
-			goto E_entry;
-		}
-		if(lookahead==')')
-		{	//printf("look:%d",lookahead);
-			match (')');
-			parentheses_check--;
-			goto E_entry;
-		}
-	}
+default:
+break;
+}
+if(mulop())
+goto F_entry;
+else if(addop())
+goto T_entry;
+else
+{
+if(lookahead=='(')
+{
+match ('(');
+parentheses_check++;
+goto E_entry;
+}
+if(lookahead==')')
+{	//printf("look:%d",lookahead);
+match (')');
+parentheses_check--;
+goto E_entry;
+}
+}
 }*/
 
 /*
@@ -199,13 +200,38 @@ void fact (void)
     break;
 
     case FLOAT:
-    /**/printf("float ")/**/;
+    /**/printf("float:%s ", lexeme)/**/;
+    // MATCH & BREAK ARE HERE BECAUSE THE CODE BELOW IT IS NOT YET FINISHED
     match (FLOAT);
     break;
 
+    //converting float lexeme to lowercase ~vina
+    int j;
+    for(j = 0; lexeme[j]; j++) {
+      lexeme[j] = tolower(lexeme[j]);
+    }
+
+    char *auxDot; //founding '.' to replace exp 'e' to *10^ ~vina
+    auxDot = strchr(lexeme,'.');
+    if(auxDot == NULL) { // didn't find '.' ~vina
+      char *beforeE, *afterE;
+      beforeE = strtok(lexeme, "e"); // what comes before 'e' ~vina
+      //CODE BELOW NOT WORKING PROPERLY ~vina
+      afterE = strtok(NULL, "e"); //what comes after 'e' ~vina
+
+      strcat(beforeE, ".0*10^(");
+      strcat(beforeE, afterE);
+      printf("\n RESULTADO: %s \n", beforeE );
+    } else { //found '.'
+
+    }
+    // RIGHT PLACE FOR MATCH & BREAK
+    // match (FLOAT);
+    // break;
+
     case OCTAL:
     /**/printf("octal ")/**/;
-	  push(convertHexToInt(lexeme));
+    push(convertHexToInt(lexeme));
     match (OCTAL);
     break;
 
@@ -337,45 +363,45 @@ int is_available(){
 
 int convertOctaToInt(char octalToConvert[]){
 
-	int n = atoi(octalToConvert);
-	int rem, i=1, octal=0;
-    while (n!=0)
-    {
-        rem=n%8;
-        n/=8;
-        octal+=rem*i;
-        i*=10;
-    }
-    printf("Result: %d", octal);
-    return octal;
+  int n = atoi(octalToConvert);
+  int rem, i=1, octal=0;
+  while (n!=0)
+  {
+    rem=n%8;
+    n/=8;
+    octal+=rem*i;
+    i*=10;
+  }
+  printf("Result: %d", octal);
+  return octal;
 
 }
 
 int convertHexToInt(char hexaToConvert[]){
-    int n,i;
-    n=0;
+  int n,i;
+  n=0;
 
-    for(i=0; hexaToConvert[i]!='\n' && hexaToConvert[i]!=0 ; i++){
-            if(hexaToConvert[i]>='0' && hexaToConvert[i]<='9')
-                n=n*16+(hexaToConvert[i]-'0');
-            else if(hexaToConvert[i]=='A' || hexaToConvert[i]=='a')
-                n=n*16+(10);
-            else if(hexaToConvert[i]=='B' || hexaToConvert[i]=='b')
-                n=n*16+(11);
-            else if(hexaToConvert[i]=='C' || hexaToConvert[i]=='c')
-                n=n*16+(12);
-            else if(hexaToConvert[i]=='D' || hexaToConvert[i]=='d')
-                n=n*16+(13);
-            else if(hexaToConvert[i]=='E' || hexaToConvert[i]=='e')
-                n=n*16+(14);
-            else if(hexaToConvert[i]=='F' || hexaToConvert[i]=='f')
-                n=n*16+(15);
-            else{
-                printf("Error:Your number Is Not Valid!");
-                return -1;
-            }
+  for(i=0; hexaToConvert[i]!='\n' && hexaToConvert[i]!=0 ; i++){
+    if(hexaToConvert[i]>='0' && hexaToConvert[i]<='9')
+    n=n*16+(hexaToConvert[i]-'0');
+    else if(hexaToConvert[i]=='A' || hexaToConvert[i]=='a')
+    n=n*16+(10);
+    else if(hexaToConvert[i]=='B' || hexaToConvert[i]=='b')
+    n=n*16+(11);
+    else if(hexaToConvert[i]=='C' || hexaToConvert[i]=='c')
+    n=n*16+(12);
+    else if(hexaToConvert[i]=='D' || hexaToConvert[i]=='d')
+    n=n*16+(13);
+    else if(hexaToConvert[i]=='E' || hexaToConvert[i]=='e')
+    n=n*16+(14);
+    else if(hexaToConvert[i]=='F' || hexaToConvert[i]=='f')
+    n=n*16+(15);
+    else{
+      printf("Error:Your number Is Not Valid!");
+      return -1;
     }
-    //printf("%d",n);
+  }
+  //printf("%d",n);
 }
 void init(){
   int i = 0;
