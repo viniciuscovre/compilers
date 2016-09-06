@@ -34,6 +34,7 @@ int main (int argc, char *argv[], char *envp[])
   printf("\n");
 
   match(EOF);
+  printa_tabela();
   parenthesis_control();
 
   exit (0);

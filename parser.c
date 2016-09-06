@@ -70,12 +70,15 @@ void expr (void)
   }
 
   term();
-  /**/if(neg){ printf("<+/-> "); }/**/
+  /**/if(neg){
+              //printf("<+/-> ");
+              push(-(pop()));
+              }/**/
 
   while( (op = addop()) ) {
-    /**/printf("<enter> ")/**/;
+    /**///printf("<enter> ")/**/;
     term();
-    /**/printf("expr:op<%c> ",op)/**/;
+    /**///printf("expr:op<%c> ",op)/**/;
     push(op);
   }
 }
@@ -127,9 +130,9 @@ void term (void)
   fact();
   while( (op = mulop()) )
   {
-    /**/printf("<enter> ")/**/;
+    /**///printf("<enter> ")/**/;
     fact();
-    /**/printf("term:op<%c> ",op)/**/;
+    /**///printf("term:op<%c> ",op)/**/;
     push(op);
   }
 }
@@ -146,7 +149,7 @@ void fact (void)
 {
   /**/ char bkplexeme[MAXID_SIZE+1],operando1,operando2,operador;/**/
 
-  int i = -1, a=0;
+  int temp,i = -1, a=0;
   switch (lookahead)
   {
     case ID:
@@ -156,7 +159,7 @@ void fact (void)
     if(lookahead == '=') {
       match('=');
       expr();
-      /**/printf("%s:<store> ",bkplexeme);/**/
+      /**///printf("%s:<store> ",bkplexeme);/**/
       i = is_available();
 
       if(i == -1) {
@@ -170,17 +173,28 @@ void fact (void)
       /*Parte Operation: essa parte vai ser removida ou modificada no futuro pra abranger todo os casos de operacao,
       por enquanto apenas resolve operacoes do tipo numero + numero ~William*/
       if(sp > 1) {
+        while(sp>1)
         operador = pop();
         operando2 = pop();
         operando1 = pop();
-        printf("Operador: %d, op1: %d, op2: %d\n",operador,operando1,operando2);
+        //printf("Operador: %d, op1: %d, op2: %d\n",operador,operando1,operando2);
         memtab[i] = operation(operador,operando1,operando2);
+      }
+      else if (sp==0)
+      {
+        temp = pop();
+        memtab[i]=temp;
+        //printf("memtab pop %d",temp);
+      }
+      else if (sp==-1)
+      {
+        memtab[i]=memtab[i-1];
       }
       /*Fim da parte Operation*/
 
-      printa_tabela();
-    } else
-    /**/printf("id:%s ",bkplexeme);/**/
+      //printa_tabela();
+    } //else
+    /**///printf("id:%s ",bkplexeme);/**/
 
     break;
 
@@ -193,7 +207,13 @@ void fact (void)
     case DEC:
     /**/printf("decimal:%s ", lexeme)/**/;
     /*Atoi eh necessario para inclusao na pilha ~William*/
-    printf("atoi %d\n",atoi(lexeme));
+    if(sp==2)
+    {
+      operador = pop();
+      operando2 = pop();
+      operando1 = pop();
+      push(operation(operador,operando1,operando2));
+    }
     push(atoi(lexeme));
     /*Fim da inclusao  de DEC na pilha~William*/
     match (DEC);
@@ -260,7 +280,7 @@ memtab[i] = operation(operador,operando1,operando2);
 Os erros mencionados aqui ja estao em tokens.h, porem ainda nao tem uso real ~William*/
 void push(int op)//op pode ser operador ou operando
 {
-  printf("push\n");
+  //printf("push\n");
   if(sp>=MAXSTACK_SIZE)
   printf("ERROR:STACK OVERFLOW\n");
   else
@@ -272,7 +292,7 @@ void push(int op)//op pode ser operador ou operando
 
 double pop()
 {
-  printf("pop\n");
+  //printf("pop\n");
   if(sp<=-1)
   {
     printf("ERROR:PUSH ON EMPTY LIST\n");
