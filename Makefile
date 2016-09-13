@@ -1,6 +1,6 @@
 CFLAGS=-I. -g
 
-relocatables=lexer.o mybc.o parser.o
+relocatables=lexer.o mybc.o parser.o vmachine.o
 
 executable=mybc
 
