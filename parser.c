@@ -45,7 +45,7 @@
 #include <vmachine.h>
 
 /*
- * mybc -> expr { cmdsep expr } <eof>
+ * mypas -> expr { cmdsep expr } <eof>
  *
  * cmdsep -> ';' | '\n'
  */
@@ -58,12 +58,16 @@ int iscmdsep(void)
     return 0;
 }
 
-void mybc(void)
+void mypas(void)
 {
     expr();/*[[*/printf("%g\n", acc)/*]]*/;
 
     while ( iscmdsep() ) {
-        expr();/*[[*/printf("%g\n", acc)/*]]*/;
+        if(lookahead!=-1)
+        {
+          expr();
+          /*[[*/printf("%g\n", acc)/*]]*/;
+        }
     }
     match(EOF);
 }
@@ -72,7 +76,7 @@ void mybc(void)
 void expr (void)
 {/*[[*/int opsymbol;/*]]*/
     term();
-    while(opsymbol=addop()) {
+    while((opsymbol=addop())) {
 	   /*[[*/accpush()/*]]*/;
            term();
 	   /*[[*/operationlib(opsymbol)/*]]*/;
@@ -83,7 +87,17 @@ void expr (void)
 void term (void)
 {/*[[*/int opsymbol/*]]*/;
     fact();
-    while(opsymbol=mulop()) {
+    while((opsymbol=mulop())) {
+	   /*[[*/accpush()/*]]*/;
+           fact();
+           /*[[*/operationlib(opsymbol)/*]]*/;
+    }
+}
+/* arith ->  NUMERO arithmetic_op NUMERO , no caso numero sera DEC inicialmente, deve evoluir pra todos os tipos*/
+void arith (void)
+{/*[[*/int opsymbol/*]]*/;
+    fact();
+    while((opsymbol=arithmetic_op())) {
 	   /*[[*/accpush()/*]]*/;
            fact();
            /*[[*/operationlib(opsymbol)/*]]*/;
@@ -99,6 +113,8 @@ void fact (void)
         variable(); break;
     case '(':
             match('('); expr(); match(')');break;
+    case '>':
+            match('>'); arith(); match(')');break;        
     default:
     	constant();
     }
@@ -125,6 +141,18 @@ int mulop (void)
             match('*'); return '*';
     case '/':
             match('/'); return '/';
+    }
+    return 0;
+}
+
+int arithmetic_op (void)
+{
+    switch (lookahead)
+    {
+    case '>':
+            match('>'); return '>';
+    case '<':
+            match('<'); return '<';
     }
     return 0;
 }

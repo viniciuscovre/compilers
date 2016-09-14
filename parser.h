@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 /********************************** Recursive LL(1) Pareser *****************************************
  *
  * Method: assign nonterminal symbols to C-function names
@@ -53,6 +53,10 @@ int mulop (void);
 void constant (void);
 /* variable -> ID */
 void variable (void);
+
+void arith (void);
+
+int arithmetic_op (void);
 
 /******************************* lexer-to-parser interface *****************************************/
 

@@ -16,7 +16,7 @@ void skipspaces (FILE *dish)
 {
         int cake;
 
-        while ( isspace ( cake = getc (dish) ) );
+        while ( isblank ( cake = getc (dish) ) );
 
         ungetc ( cake, dish );
 }
@@ -74,21 +74,21 @@ int is_octal(FILE *dish)
         return 0;
 }
 
-int gettoken (FILE *tokenstream)
+int gettoken (FILE *sourcecode)
 {
         int token;
 
-        skipspaces (tokenstream);
+        skipspaces (sourcecode);
 
-        if ( token = is_identifier(tokenstream) ) {
+        if ( token = is_identifier(sourcecode) ) {
                 return ID;
         }
 
-        if ( token = is_decimal (tokenstream) ) {
+        if ( token = is_decimal (sourcecode) ) {
                 return DEC;
         }
 
-        token = getc (tokenstream);
+        token = getc (sourcecode);
 
         return token;
 }

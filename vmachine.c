@@ -64,6 +64,7 @@ void store(char const *symbol)
 
 void operationlib(int op)
 {
+  //int temp;
     switch(op) {
         case '+':
             acc += stack[sp];
@@ -81,5 +82,12 @@ void operationlib(int op)
             stack[sp] /= acc;
             accpop();
             break;
+        case '>':
+            if (acc > stack[sp])
+                acc = 1;
+            else
+                acc = 0;
+            break;
+
     }
 }
