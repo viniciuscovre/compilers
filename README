@@ -7,15 +7,9 @@ TO DO
 - adicionar codigo de IF ELSE WHILE .....
 - cmdsep deve ter os casos de ";" e "/n"
 - token mismatch quando acaba com ";"
-- implementar Hex Oct e Float 
+- implementar Hex Oct e Float
 - colocar no vmachine "<" ">"
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
-
-
-==>
-- projeto Mypas (basico do pascal)
-- mudar nome do projeto para mypas
-- alterar o Make file para o mypas
 
 // em keywords.[ch]
 // begin if then else while do repeat until procedure function end
