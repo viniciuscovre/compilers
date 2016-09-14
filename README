@@ -1,0 +1,21 @@
+TO DO
+- colocar iskeyword na isidentifier
+- colocar as labels(T_EXPR, T_TERM,....)
+- verificar /n no skipspace
+- na função gettoken - alterar "tokenstream" para "sourcecode"
+- alterar o nome do projeto de mybc para progcalc
+- adicionar codigo de IF ELSE WHILE .....
+- cmdsep deve ter os casos de ";" e "/n"
+- token mismatch quando acaba com ";"
+- implementar Hex Oct e Float 
+- colocar no vmachine "<" ">"
+- No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
+
+
+==>
+- projeto Mypas (basico do pascal)
+- mudar nome do projeto para mypas
+- alterar o Make file para o mypas
+
+// em keywords.[ch]
+// begin if then else while do repeat until procedure function end
