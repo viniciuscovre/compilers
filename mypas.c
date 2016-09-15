@@ -34,7 +34,7 @@ int main (int argc, char *argv[], char *envp[])
         }
 
         lookahead = gettoken (source_code);
-        //printf("lookahead %c\n", lookahead);
+        printf("||| lookahead: %c |||\n", lookahead);
         mypas ();
 
         printf("\n");
@@ -48,7 +48,7 @@ void leitura_comandos()
   int i=0,numero_de_comandos=-1;
   char entrada[MAX_NUM_DE_COMANDOS][TAMANHO_MAX_DE_CADA_COMANDO];
   printf("\nBem vindo ao MyPas!\n");
-  printf("Digite os comandos e aperte enter. Digite '%s' para sair\n",palavra_de_saida);
+  printf("Digite os comandos e aperte enter.\nDigite '%s' para sair...\n\n",palavra_de_saida);
 
   do
   {
