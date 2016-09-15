@@ -57,10 +57,10 @@ int is_identifier(FILE *dish)
 //   return 0;
 // }
 
-int i = 0; //making i global to use in is_float verification ~vina
+// int i = 0; //making i global to use in is_float verification ~vina
 int is_decimal(FILE *dish)
 {
-  // int i = 0;
+  int i = 0;
   if (isdigit (lexeme[i] = getc(dish))) {
     if (lexeme[i] == '0') {
       if( (lexeme[++i] = getc(dish)) == '0' || lexeme[i] == EOF || lexeme[i] == EOL ) {
@@ -92,67 +92,58 @@ int is_decimal(FILE *dish)
 
 int is_octal(FILE *dish)
 {
-  int octpref = getc(dish);
-  if (octpref == '0') {
-    int cake = getc(dish);
-    if ( cake >= '1' && cake <= '7') {
-      while ( (cake = getc(dish)) >= '0' && cake <= '7');
-      ungetc (cake, dish);
+  int i = 0;
+  lexeme[i] = getc(dish);
+  if (lexeme[i] == '0') {
+    lexeme[++i] = getc(dish);
+    if ( lexeme[i] >= '1' && lexeme[i] <= '7') {
+      while ( (lexeme[++i] = getc(dish)) >= '0' && lexeme[i] <= '7');
+      ungetc (lexeme[i], dish);
       return OCTAL;
     } else {
-      ungetc (cake, dish);
-      ungetc (octpref, dish);
+      ungetc (lexeme[i], dish);
+      ungetc (lexeme[i-1], dish);
       return 0;
     }
   }
-  ungetc (octpref, dish);
+  ungetc (lexeme[i], dish);
   return 0;
 }
 
 int is_hexadecimal(FILE *dish)
 {
-  int pfx1 = getc(dish);
-  int head;
-  if (pfx1 == '0') {
-    int pfx2 = getc(dish);
-
-    if (pfx2 =='x'){
-      head = getc(dish);
-      if ( isdigit(head) || (tolower(head) >= 'a' && tolower(head) <= 'f') ) {
-        while ( isdigit((head = getc(dish))) || (tolower(head) >= 'a' && tolower(head) <= 'f') );
-
-        // if( head != EOF || head != EOL) {
-        //   return 0;
-        // } else {
-        //   ungetc(head,dish);
-        //   return HEX;
-        // }
-        ungetc(head,dish);
+  int i = 0;
+  lexeme[i] = getc(dish);
+  if (lexeme[i] == '0') {
+    if ( (lexeme[++i] = getc(dish)) == 'x'){
+      lexeme[++i] = getc(dish);
+      if ( isdigit(lexeme[i]) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') ) {
+        while ( isdigit((lexeme[++i] = getc(dish))) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') );
+        ungetc(lexeme[i],dish);
         return HEX;
 
       } else {
-        ungetc(head,dish);
-        ungetc(pfx2,dish);
-        ungetc(pfx1,dish);
+        ungetc(lexeme[i],dish);
+        ungetc(lexeme[i-1],dish);
+        ungetc(lexeme[i-2],dish);
         return 0;
       }
 
     } else{
-      ungetc(pfx2,dish);
-      ungetc(pfx1,dish);
+      ungetc(lexeme[i],dish);
+      ungetc(lexeme[i-1],dish);
       return 0;
     }
 
   } else {
-    ungetc(pfx1,dish);
+    ungetc(lexeme[i],dish);
   }
-
   return 0;
 }
 
 int is_float(FILE *dish)
 {
-  // int i = 0;
+  int i = 0;
   lexeme[i] = getc(dish);
   if (tolower(lexeme[i]) == 'e' || lexeme[i] == '.') {
     if (lexeme[i] == '.') {
@@ -230,24 +221,19 @@ int gettoken (FILE *tokenstream)
   skipspaces (tokenstream);
 
   token = is_identifier(tokenstream);
-  if (token)
-  return ID;
+  if (token) return ID;
 
   token = is_decimal (tokenstream);
-  if (token)
-  return DEC;
+  if (token) return DEC;
 
   token = is_octal(tokenstream);
-  if (token)
-  return OCTAL;
+  if (token) return OCTAL;
 
   token = is_hexadecimal (tokenstream);
-  if (token)
-  return HEX;
+  if (token) return HEX;
 
   token = is_float(tokenstream);
-  if (token)
-  return token;
+  if (token) return token;
 
   token = getc (tokenstream);
   return token;

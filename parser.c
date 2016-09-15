@@ -100,16 +100,16 @@ void fact (void)
   switch (lookahead) {
 
     case ID:
-      variable(); break;
+    variable(); break;
 
     case '(':
-      match('('); expr(); match(')');break;
+    match('('); expr(); match(')');break;
 
     case '>':
-      match('>'); arith(); match(')');break;
+    match('>'); arith(); match(')');break;
 
     default:
-      constant();
+    constant();
   }
 }
 
@@ -167,23 +167,28 @@ int arithmetic_op (void)
 *           | [[ print FLT ]] FLT */
 void constant (void)
 {
-  /*[[*/cp2acc(atof(lexeme))/*]]*/;
+  int value = -1; //starts with -1 to detect a possible further error
   switch(lookahead) {
 
     case DEC:
-      match(DEC);
-      /*[[*/printf("decimal: ")/*]]*/;
-      break;
+    /*[[*/cp2acc(atof(lexeme))/*]]*/;
+    match(DEC);
+    /*[[*/printf("decimal: ")/*]]*/;
+    break;
 
     case OCTAL:
-      match(OCTAL);
-      /*[[*/printf("octal: ")/*]]*/;
-      break;
+    value = octalToInt(lexeme);
+    /*[[*/cp2acc((float)value)/*]]*/;
+    match(OCTAL);
+    /*[[*/printf("octal value in decimal: ")/*]]*/;
+    break;
 
     case HEX:
-      match(HEX);
-      /*[[*/printf("hexadecimal: ")/*]]*/;
-      break;
+    value = hexToInt(lexeme);
+    /*[[*/cp2acc((float)value)/*]]*/;
+    match(HEX);
+    /*[[*/printf("hexadecimal value in decimal: ")/*]]*/;
+    break;
 
     /* VRIFY DEFAULT CASE ~vina */
   }
@@ -201,6 +206,37 @@ void variable (void)
   } else { // R-VALUE:
     /*[[*/recall(varname)/*]]*/;
   }
+}
+
+int octalToInt(char octalToConvert[]){
+
+  int n = atoi(octalToConvert);
+  int octal = 0, i = 0, rem;
+  while (n!=0)
+  {
+    rem = n%10;
+    n/=10;
+    octal += rem*pow(8,i);
+    ++i;
+  }
+  return octal;
+}
+
+int hexToInt(char hexToConvert[])
+{
+  int j;
+  int len = strlen(hexToConvert);
+  char aux[len-2];
+
+  for(j = 2; j < len; j++) //removing 2 prefixes (0x) of hexadecimal ~vina
+  {
+    aux[j-2] = hexToConvert[j];
+  }
+  aux[(len-2)-1] = 0; //closing string with '/0' ~vina
+
+
+  int hex = (int)strtol(aux, NULL, 16); //hex --> decimal ~vina
+  return hex;
 }
 
 /******************************* lexer-to-parser interface *****************************************/

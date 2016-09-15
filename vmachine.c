@@ -75,23 +75,25 @@ void operationlib(int op)
     acc += stack[sp];
     sp--;
     break;
+
     case '*':
     acc *= stack[sp];
     sp--;
     break;
+
     case '-':
     stack[sp] -= acc;
     accpop();
     break;
+
     case '/':
     stack[sp] /= acc;
     accpop();
     break;
+
     case '>':
-    if (acc > stack[sp])
-    acc = 1;
-    else
-    acc = 0;
+    if (acc > stack[sp]) acc = 1;
+    else acc = 0;
     break;
 
   }
