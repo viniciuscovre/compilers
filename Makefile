@@ -12,5 +12,5 @@ clean:
 	$(RM)  $(relocatables)
 mostlyclean: clean
 	$(RM) $(executable) *~
-indent: 
-indent -nfca -orig - nuts - ts4 *.[ch]
+indent:
+	indent -nfca -orig - nuts - ts4 *.[ch]
