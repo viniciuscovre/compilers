@@ -45,116 +45,116 @@
 #include <vmachine.h>
 
 /*
- * mypas -> expr { cmdsep expr } <eof>
- *
- * cmdsep -> ';' | '\n'
- */
+* mypas -> expr { cmdsep expr } <eof>
+*
+* cmdsep -> ';' | '\n'
+*/
 int iscmdsep(void)
 {
-    switch(lookahead){
-        case ';':case'\n':
-            match(lookahead);return 1;
-    }
-    return 0;
+  switch(lookahead){
+    case ';':case'\n':
+    match(lookahead);return 1;
+  }
+  return 0;
 }
 
 void mypas(void)
 {
-    expr();/*[[*/printf("%g\n", acc)/*]]*/;
+  expr();/*[[*/printf("%g\n", acc)/*]]*/;
 
-    while ( iscmdsep() ) {
-        if(lookahead!=-1)
-        {
-          expr();
-          /*[[*/printf("%g\n", acc)/*]]*/;
-        }
+  while ( iscmdsep() ) {
+    if(lookahead!=-1)
+    {
+      expr();
+      /*[[*/printf("%g\n", acc)/*]]*/;
     }
-    match(EOF);
+  }
+  match(EOF);
 }
 
 /* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
 void expr (void)
 {/*[[*/int opsymbol;/*]]*/
+  term();
+  while((opsymbol=addop())) {
+    /*[[*/accpush()/*]]*/;
     term();
-    while((opsymbol=addop())) {
-	   /*[[*/accpush()/*]]*/;
-           term();
-	   /*[[*/operationlib(opsymbol)/*]]*/;
-    }
+    /*[[*/operationlib(opsymbol)/*]]*/;
+  }
 }
 
 /* term -> fact { mulop fact [[ print mulop.pf ]] } */
 void term (void)
 {/*[[*/int opsymbol/*]]*/;
+  fact();
+  while((opsymbol=mulop())) {
+    /*[[*/accpush()/*]]*/;
     fact();
-    while((opsymbol=mulop())) {
-	   /*[[*/accpush()/*]]*/;
-           fact();
-           /*[[*/operationlib(opsymbol)/*]]*/;
-    }
+    /*[[*/operationlib(opsymbol)/*]]*/;
+  }
 }
 /* arith ->  NUMERO arithmetic_op NUMERO , no caso numero sera DEC inicialmente, deve evoluir pra todos os tipos*/
 void arith (void)
 {/*[[*/int opsymbol/*]]*/;
+  fact();
+  while((opsymbol=arithmetic_op())) {
+    /*[[*/accpush()/*]]*/;
     fact();
-    while((opsymbol=arithmetic_op())) {
-	   /*[[*/accpush()/*]]*/;
-           fact();
-           /*[[*/operationlib(opsymbol)/*]]*/;
-    }
+    /*[[*/operationlib(opsymbol)/*]]*/;
+  }
 }
 
 /* fact -> variable | constant | ( expr ) */
-
 void fact (void)
 {
-    switch (lookahead) {
+  switch (lookahead) {
     case ID:
-        variable(); break;
+      variable(); break;
     case '(':
-            match('('); expr(); match(')');break;
+      match('('); expr(); match(')');break;
     case '>':
-            match('>'); arith(); match(')');break;        
+      match('>'); arith(); match(')');break;
     default:
-    	constant();
-    }
+      constant();
+  }
 }
 
 /* addop -> + | - */
 int addop (void)
 {
-    switch (lookahead)
-    {
+  switch (lookahead)
+  {
     case '+':
-            match('+'); return '+';
+    match('+'); return '+';
     case '-':
-            match('-'); return '-';
-    }
-    return 0;
+    match('-'); return '-';
+  }
+  return 0;
 }
 /* mulop -> * | / */
 int mulop (void)
 {
-    switch (lookahead)
-    {
+  switch (lookahead)
+  {
     case '*':
-            match('*'); return '*';
+    match('*'); return '*';
     case '/':
-            match('/'); return '/';
-    }
-    return 0;
+    match('/'); return '/';
+  }
+  return 0;
 }
 
+/* arithmetic_op -> > | < */
 int arithmetic_op (void)
 {
-    switch (lookahead)
-    {
+  switch (lookahead)
+  {
     case '>':
-            match('>'); return '>';
+    match('>'); return '>';
     case '<':
-            match('<'); return '<';
-    }
-    return 0;
+    match('<'); return '<';
+  }
+  return 0;
 }
 /* constant -> [[ print DEC ]] DEC
 *           | [[ print OCT ]] OCT
@@ -162,21 +162,21 @@ int arithmetic_op (void)
 *           | [[ print FLT ]] FLT */
 void constant (void)
 {
-      /*[[*/cp2acc(atof(lexeme))/*]]*/;match(DEC);
+  /*[[*/cp2acc(atof(lexeme))/*]]*/;match(DEC);
 }
 
 /* variable -> [[ print ID ]] ID */
 void variable (void)
 {/*[[*/char varname[MAXID_SIZE]/*]]*/;
-    /*[[*/strcpy(varname, lexeme)/*]]*/;
-    match(ID);
-    if (lookahead == '=') {// L-VALUE:
-	    match('=');
-	    expr();
-	    /*[[*/store(varname)/*]]*/;
-    } else { // R-VALUE:
-	    /*[[*/recall(varname)/*]]*/;
-    }
+  /*[[*/strcpy(varname, lexeme)/*]]*/;
+  match(ID);
+  if (lookahead == '=') {// L-VALUE:
+    match('=');
+    expr();
+    /*[[*/store(varname)/*]]*/;
+  } else { // R-VALUE:
+    /*[[*/recall(varname)/*]]*/;
+  }
 }
 
 /******************************* lexer-to-parser interface *****************************************/
@@ -187,12 +187,12 @@ extern int gettoken (FILE *); /** @ lexer **/
 
 void match (int expected_token)
 {
-    if (expected_token == lookahead) {
-            lookahead = gettoken (source_code);
-    } else {
-            fprintf (stderr, "parser: token mismatch error.\n");
-            fprintf (stderr, "expecting %d but seen %d... exting\n",
-                    expected_token, lookahead);
-            exit (SYNTAX_ERR);
-    }
+  if (expected_token == lookahead) {
+    lookahead = gettoken (source_code);
+  } else {
+    fprintf (stderr, "parser: token mismatch error.\n");
+    fprintf (stderr, "expecting %d but seen %d... exting\n",
+    expected_token, lookahead);
+    exit (SYNTAX_ERR);
+  }
 }
