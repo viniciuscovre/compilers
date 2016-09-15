@@ -1,5 +1,6 @@
 TO DO
 - colocar iskeyword na isidentifier
+- verificação is_available para ver se tem posição disponível na symtab
 - colocar as labels(T_EXPR, T_TERM,....)
 - adicionar codigo de IF ELSE WHILE .....
 - implementar Hex Oct e Float

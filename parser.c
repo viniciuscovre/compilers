@@ -93,6 +93,26 @@ void term (void)
     /*[[*/operationlib(opsymbol)/*]]*/;
   }
 }
+
+/* fact -> variable | constant | ( expr ) */
+void fact (void)
+{
+  switch (lookahead) {
+
+    case ID:
+      variable(); break;
+
+    case '(':
+      match('('); expr(); match(')');break;
+
+    case '>':
+      match('>'); arith(); match(')');break;
+
+    default:
+      constant();
+  }
+}
+
 /* arith ->  NUMERO arithmetic_op NUMERO , no caso numero sera DEC inicialmente, deve evoluir pra todos os tipos*/
 void arith (void)
 {/*[[*/int opsymbol/*]]*/;
@@ -101,21 +121,6 @@ void arith (void)
     /*[[*/accpush()/*]]*/;
     fact();
     /*[[*/operationlib(opsymbol)/*]]*/;
-  }
-}
-
-/* fact -> variable | constant | ( expr ) */
-void fact (void)
-{
-  switch (lookahead) {
-    case ID:
-      variable(); break;
-    case '(':
-      match('('); expr(); match(')');break;
-    case '>':
-      match('>'); arith(); match(')');break;
-    default:
-      constant();
   }
 }
 
@@ -162,7 +167,26 @@ int arithmetic_op (void)
 *           | [[ print FLT ]] FLT */
 void constant (void)
 {
-  /*[[*/cp2acc(atof(lexeme))/*]]*/;match(DEC);
+  /*[[*/cp2acc(atof(lexeme))/*]]*/;
+  switch(lookahead) {
+
+    case DEC:
+      match(DEC);
+      /*[[*/printf("decimal: ")/*]]*/;
+      break;
+
+    case OCTAL:
+      match(OCTAL);
+      /*[[*/printf("octal: ")/*]]*/;
+      break;
+
+    case HEX:
+      match(HEX);
+      /*[[*/printf("hexadecimal: ")/*]]*/;
+      break;
+
+    /* VRIFY DEFAULT CASE ~vina */
+  }
 }
 
 /* variable -> [[ print ID ]] ID */

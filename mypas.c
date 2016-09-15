@@ -19,27 +19,27 @@ extern int lookahead; // @ parser.c
 
 int main (int argc, char *argv[], char *envp[])
 {
-        if (argc == 1) {
-                //para remover o modo de leitura de comandos direto do terminal comente as 2 linhas seguintes e descomente a terceira linha seguinte
-                leitura_comandos();
-                source_code = fopen("comandos","r");
-                //source_code = stdin;
-        } else {
-                source_code = fopen (argv[1], "r");
-                if (source_code == NULL) {
-                        fprintf (stderr, "%s: cannot open %s... exiting\n",
-                                argv[0], argv[1]);
-                        exit (-1);
-                }
-        }
+  if (argc == 1) {
+    //para remover o modo de leitura de comandos direto do terminal comente as 2 linhas seguintes e descomente a terceira linha seguinte
+    leitura_comandos();
+    source_code = fopen("comandos","r");
+    //source_code = stdin;
+  } else {
+    source_code = fopen (argv[1], "r");
+    if (source_code == NULL) {
+      fprintf (stderr, "%s: cannot open %s... exiting\n",
+      argv[0], argv[1]);
+      exit (-1);
+    }
+  }
 
-        lookahead = gettoken (source_code);
-        printf("||| lookahead: %c |||\n", lookahead);
-        mypas ();
+  lookahead = gettoken (source_code);
+  // printf("||| lookahead: %c |||\n", lookahead);
+  mypas ();
 
-        printf("\n");
+  printf("\n");
 
-        exit (0);
+  exit (0);
 }
 void leitura_comandos()
 {
@@ -54,13 +54,16 @@ void leitura_comandos()
   {
     numero_de_comandos++;
     scanf("%s",entrada[numero_de_comandos]);
-  }while(strcmp(palavra_de_saida,entrada[numero_de_comandos]));
+  } while (strcmp(palavra_de_saida,entrada[numero_de_comandos]));
+
   do
   {
-  fprintf(comandos,entrada[i]);
-  if((i+1)!=numero_de_comandos)
-  fprintf(comandos,"\n");
-  i++;
-}while(i<numero_de_comandos);
-fclose(comandos);
+    fprintf(comandos,entrada[i]);
+    if((i+1)!=numero_de_comandos)
+    fprintf(comandos,"\n");
+    i++;
+  } while (i<numero_de_comandos);
+  fclose(comandos);
+  printf("____________________________________\n\n");
+
 }

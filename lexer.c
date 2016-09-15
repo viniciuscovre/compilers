@@ -16,7 +16,8 @@ void skipspaces (FILE *dish)
 {
   int cake;
 
-  while ( isblank ( cake = getc (dish) ) );
+  while ( isspace ( cake = getc (dish) ) );
+  // while ( isblank ( cake = getc (dish) ) ); //isblank is not working properly
 
   ungetc ( cake, dish );
 }
@@ -63,7 +64,7 @@ int is_decimal(FILE *dish)
   if (isdigit (lexeme[i] = getc(dish))) {
     if (lexeme[i] == '0') {
       if( (lexeme[++i] = getc(dish)) == '0' || lexeme[i] == EOF || lexeme[i] == EOL ) {
-        ungetc (lexeme[i], dish);
+        // ungetc (lexeme[i], dish);
         return DEC;
       } else if (lexeme[i] == '.' || tolower(lexeme[i]) == 'e') {
         //for later float verification ~vina
@@ -94,7 +95,7 @@ int is_octal(FILE *dish)
   int octpref = getc(dish);
   if (octpref == '0') {
     int cake = getc(dish);
-    if ( cake >= '0' && cake <= '7') {
+    if ( cake >= '1' && cake <= '7') {
       while ( (cake = getc(dish)) >= '0' && cake <= '7');
       ungetc (cake, dish);
       return OCTAL;
@@ -120,22 +121,26 @@ int is_hexadecimal(FILE *dish)
       if ( isdigit(head) || (tolower(head) >= 'a' && tolower(head) <= 'f') ) {
         while ( isdigit((head = getc(dish))) || (tolower(head) >= 'a' && tolower(head) <= 'f') );
 
-        if( head != EOF || head != EOL) {
-          return 0;
-        } else {
-          ungetc(head,dish);
-          return HEX;
-        }
+        // if( head != EOF || head != EOL) {
+        //   return 0;
+        // } else {
+        //   ungetc(head,dish);
+        //   return HEX;
+        // }
+        ungetc(head,dish);
+        return HEX;
 
       } else {
         ungetc(head,dish);
         ungetc(pfx2,dish);
         ungetc(pfx1,dish);
+        return 0;
       }
 
     } else{
       ungetc(pfx2,dish);
       ungetc(pfx1,dish);
+      return 0;
     }
 
   } else {
