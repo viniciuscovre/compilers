@@ -4,7 +4,7 @@ TO DO
 - colocar as labels(T_EXPR, T_TERM,....)
 - adicionar codigo de IF ELSE WHILE .....
 - implementar Float
-- Reconhecer mais constantes (não apenas a primeia cte digitada)
+- Reconhecer mais constantes (não apenas a primeia cte digitada) quando usado o comando ENTER (nao ';')
 - colocar no vmachine "<" ">"
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
 // em keywords.[ch]
