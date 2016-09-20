@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 /* local include */
 #include <tokens.h>
 #include <parser.h>
@@ -52,8 +53,8 @@
 int iscmdsep(void)
 {
   switch(lookahead){
-    case ';':case'\n':
-    match(lookahead);return 1;
+    case ';': case '\n':
+    match(lookahead); return 1;
   }
   return 0;
 }
@@ -173,21 +174,21 @@ void constant (void)
     case DEC:
     /*[[*/cp2acc(atof(lexeme))/*]]*/;
     match(DEC);
-    /*[[*/printf("decimal: ")/*]]*/;
+    // /*[[*/printf("decimal: ")/*]]*/;
     break;
 
     case OCTAL:
     value = octalToInt(lexeme);
     /*[[*/cp2acc((float)value)/*]]*/;
     match(OCTAL);
-    /*[[*/printf("octal value in decimal: ")/*]]*/;
+    // /*[[*/printf("octal value in decimal: ")/*]]*/;
     break;
 
     case HEX:
     value = hexToInt(lexeme);
     /*[[*/cp2acc((float)value)/*]]*/;
     match(HEX);
-    /*[[*/printf("hexadecimal value in decimal: ")/*]]*/;
+    // /*[[*/printf("hexadecimal value in decimal: ")/*]]*/;
     break;
 
     /* VRIFY DEFAULT CASE ~vina */

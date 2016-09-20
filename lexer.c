@@ -16,9 +16,8 @@ void skipspaces (FILE *dish)
 {
   int cake;
 
-  while ( isspace ( cake = getc (dish) ) );
-  // while ( isblank ( cake = getc (dish) ) ); //isblank is not working properly
-
+  // while ( isspace ( cake = getc (dish) ) );
+  while ( isblank ( cake = getc (dish) ) );
   ungetc ( cake, dish );
 }
 
