@@ -6,6 +6,7 @@ TO DO
 - implementar Float
 - Reconhecer mais constantes (não apenas a primeia cte digitada) quando usado o comando ENTER (nao ';')
 - colocar no vmachine "<" ">"
+- Operadores: Diferente, igual, maior, menor, and, or, not...etc
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
 // em keywords.[ch]
 // begin if then else while do repeat until procedure function end
