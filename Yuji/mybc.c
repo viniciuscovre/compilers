@@ -6,35 +6,32 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <lexer.h>
 #include <mybc.h>
+#include <vmachine.h>
 
-FILE *source;
+FILE *source_code;
 
 extern int lookahead; // @ parser.c
-extern int parentheses_check = 0; // @ parser.c
 
-int main (int argc, char *argv[], char *envp[])
+main (int argc, char *argv[], char *envp[])
 {
-  if (argc == 1) {
-    source = stdin;
-  } else {
-    source = fopen (argv[1], "r");
-    if (source == NULL) {
-      fprintf (stderr, "%s: cannot open %s... exiting\n",
-      argv[0], argv[1]);
-      exit (-1);
-    }
-  }
+        if (argc == 1) {
+                source_code = stdin;
+        } else {
+                source_code = fopen (argv[1], "r");
+                if (source_code == NULL) {
+                        fprintf (stderr, "%s: cannot open %s... exiting\n",
+                                argv[0], argv[1]);
+                        exit (-1);
+                }
+        }
 
-  lookahead = gettoken (source);
+        lookahead = gettoken (source_code);
 
-  // init();
+        mybc ();
 
-  expr ();
-  printf("\n");
+        printf("\n");
 
-  match(EOF);
-  parenthesis_control();
-
-  exit (0);
+        exit (0);
 }

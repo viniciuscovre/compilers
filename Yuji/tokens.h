@@ -16,5 +16,5 @@ enum {
 };
 
 enum {
-	EOT = 10, //END OF TRANSMISSION
+	EOL = 10, //END OF LINE
 };

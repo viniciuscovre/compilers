@@ -1,0 +1,20 @@
+TO DO
+- colocar iskeyword na isidentifier
+- verificação is_available para ver se tem posição disponível na symtab
+- colocar as labels(T_EXPR, T_TERM,....)
+- adicionar codigo de IF ELSE WHILE .....
+- implementar Float
+- Reconhecer mais constantes (não apenas a primeia cte digitada) quando usado o comando ENTER (nao ';')
+- colocar no vmachine "<" ">"
+- Operadores: Diferente, igual, maior, menor, and, or, not...etc
+- No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
+// em keywords.[ch]
+// begin if then else while do repeat until procedure function end
+
+DONE
+- implementar Hex, Oct FEITO ~vina
+- verificar \n no skipspace FEITO ~William
+- alterar o nome do projeto de mypas para progcalc ~FEITO ~William (Assumindo que a tarefa correta seja mudar o nome de progcalc para mypas)
+- cmdsep deve ter os casos de ";" e "/n" FEITO ~William
+- token mismatch quando acaba com ";" FEITO ~William
+- - na função gettoken - alterar "tokenstream" para "sourcecode" FEITO -William
