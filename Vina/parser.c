@@ -177,6 +177,12 @@ void constant (void)
     // /*[[*/printf("decimal: ")/*]]*/;
     break;
 
+    case FLOAT:
+    /*[[*/cp2acc(atof(lexeme))/*]]*/;
+    match(FLOAT);
+    // /*[[*/printf("float: ")/*]]*/;
+    break;
+
     case OCTAL:
     value = octalToInt(lexeme);
     /*[[*/cp2acc((float)value)/*]]*/;

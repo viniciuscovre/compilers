@@ -1,9 +1,9 @@
 TO DO
 - colocar iskeyword na isidentifier
+- FLOAT operations
 - verificação is_available para ver se tem posição disponível na symtab
 - colocar as labels(T_EXPR, T_TERM,....)
 - adicionar codigo de IF ELSE WHILE .....
-- implementar Float
 - Reconhecer mais constantes (não apenas a primeia cte digitada) quando usado o comando ENTER (nao ';')
 - colocar no vmachine "<" ">"
 - Operadores: Diferente, igual, maior, menor, and, or, not...etc
@@ -12,6 +12,7 @@ TO DO
 // begin if then else while do repeat until procedure function end
 
 DONE
+- implementar Float ~vina
 - implementar Hex, Oct FEITO ~vina
 - verificar \n no skipspace FEITO ~William
 - alterar o nome do projeto de mypas para progcalc ~FEITO ~William (Assumindo que a tarefa correta seja mudar o nome de progcalc para mypas)
