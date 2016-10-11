@@ -171,11 +171,11 @@ void constant (void)
   int value = -1; //starts with -1 to detect a possible further error
   switch(lookahead) {
 
-    case DEC:
-    /*[[*/cp2acc(atof(lexeme))/*]]*/;
-    match(DEC);
-    // /*[[*/printf("decimal: ")/*]]*/;
-    break;
+    // case DEC:
+    // /*[[*/cp2acc(atof(lexeme))/*]]*/;
+    // match(DEC);
+    // // /*[[*/printf("decimal: ")/*]]*/;
+    // break;
 
     case FLOAT:
     /*[[*/cp2acc(atof(lexeme))/*]]*/;
@@ -257,8 +257,8 @@ void match (int expected_token)
   if (expected_token == lookahead) {
     lookahead = gettoken (source_code);
   } else {
-    fprintf (stderr, "parser: token mismatch error.\n");
-    fprintf (stderr, "expecting %d but seen %d... exting\n",
+    fprintf (stderr, "\nparser: token mismatch error.\n");
+    fprintf (stderr, "expecting %d but seen %d. Exting...\n",
     expected_token, lookahead);
     exit (SYNTAX_ERR);
   }

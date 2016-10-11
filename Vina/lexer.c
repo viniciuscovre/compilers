@@ -16,8 +16,8 @@ void skipspaces (FILE *dish)
 {
   int cake;
 
-  // while ( isspace ( cake = getc (dish) ) );
-  while ( isblank ( cake = getc (dish) ) );
+  while ( isspace ( cake = getc (dish) ) && cake != '\n' );
+  // while ( isblank ( cake = getc (dish) ) );
   ungetc ( cake, dish );
 }
 
@@ -122,80 +122,6 @@ int is_hexadecimal(FILE *dish)
   }
   return 0;
 }
-
-// int is_float(FILE *dish)
-// {
-//   int i = 0;
-//   lexeme[i] = getc(dish);
-//   if (tolower(lexeme[i]) == 'e' || lexeme[i] == '.') {
-//     if (lexeme[i] == '.') {
-//       if ( isdigit((lexeme[++i] = getc(dish))) ) {
-//         while( isdigit(lexeme[++i]=getc(dish)) );
-//         if ( tolower(lexeme[i]) == 'e') { //VERIFYING EXP ~vina
-//           lexeme[++i] = getc(dish);
-//           // if(!isdigit(lexeme[i]) && lexeme[i] != '-' && lexeme[i] != '+' && lexeme[i] != EOF && lexeme[i] != EOL) {
-//           //   ungetc (lexeme[i], dish);
-//           //   return 0;
-//           // }
-//           if( lexeme[i] == '+' || lexeme[i] == '-' ) {
-//             lexeme[++i] = getc(dish);
-//             if (isdigit(lexeme[i])) {
-//               while( isdigit(lexeme[++i]=getc(dish)) );
-//               if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOL) {
-//                 ungetc (lexeme[i], dish);
-//                 return FLOAT;
-//               }
-//               ungetc (lexeme[i], dish);
-//               return 0;
-//             }
-//             ungetc (lexeme[i], dish);
-//             return 0;
-//           }
-//           if (lexeme[i] == EOF || lexeme[i] == EOL) {
-//             ungetc (lexeme[i], dish);
-//             return FLOAT;
-//           }
-//           if(isdigit(lexeme[i])) {
-//             while( isdigit(lexeme[++i]=getc(dish)) );
-//             if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOL) {
-//               ungetc (lexeme[i], dish);
-//               return FLOAT;
-//             }
-//             ungetc (lexeme[i], dish);
-//             return 0;
-//           }
-//           ungetc (lexeme[i], dish);
-//           return 0;
-//         } else if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOL) {
-//           ungetc (lexeme[i], dish);
-//           return FLOAT;
-//         } else {
-//           ungetc (lexeme[i], dish);
-//           return 0;
-//         }
-//       }
-//       ungetc (lexeme[i], dish);
-//       return 0;
-//     } else { // (decimal ...) 'e' something ~vina
-//     lexeme[++i] = getc(dish);
-//     if(lexeme[i] == EOF || lexeme[i] == EOL) {
-//       ungetc(lexeme[i], dish);
-//       return FLOAT;
-//     }
-//     if( lexeme[i] == '+' || lexeme [i] == '-' || isdigit(lexeme[i]) ) {
-//       while( isdigit(lexeme[++i] = getc(dish)) );
-//       if (isdigit(lexeme[i-1])) {
-//         ungetc(lexeme[i], dish);
-//         return FLOAT;
-//       }
-//     }
-//     ungetc(lexeme[i], dish);
-//     return 0;
-//   }
-// }
-// ungetc (lexeme[i], dish);
-// return 0;
-// }
 
 int is_float(FILE *tape) {
 
