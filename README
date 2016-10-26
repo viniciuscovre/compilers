@@ -1,6 +1,5 @@
 TO DO
-- colocar iskeyword na isidentifier
-- FLOAT operations
+- FLOAT operations - juntar com versão com IFs
 - verificação is_available para ver se tem posição disponível na symtab
 - colocar as labels(T_EXPR, T_TERM,....)
 - adicionar codigo de IF ELSE WHILE .....
@@ -10,8 +9,12 @@ TO DO
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
 // em keywords.[ch]
 // begin if then else while do repeat until procedure function end
+- Parser - na hora de declarar -> botar na tabela
+- Em expr() -> case ID -> variables() -> verificar se o simbolo foi devidamente cadastrado, retornar erro
+- toda consulta verificar existencia do simbolo
 
 DONE
+- colocar iskeyword na isidentifier - DONE - Yuji
 - implementar Float ~vina
 - implementar Hex, Oct FEITO ~vina
 - verificar \n no skipspace FEITO ~William
