@@ -2,7 +2,7 @@ CFLAGS=-I. -g
 
 project = mypas
 
-relocatables = $(project).o lexer.o parser.o vmachine.o
+relocatables = $(project).o lexer.o parser.o vmachine.o symtab.o
 
 executable = $(project)
 
@@ -13,4 +13,4 @@ clean:
 mostlyclean: clean
 	$(RM) $(executable) *~
 indent:
-	indent -nfca -orig - nuts - ts4 *.[ch]
+	indent -nfca -nsc -orig - nuts - ts4 *.[ch]

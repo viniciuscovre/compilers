@@ -46,6 +46,12 @@
 #include <lexer.h>
 #include <vmachine.h>
 #include <keywords.h>
+#include <symtab.h>
+
+
+#define MAX_ARG_NUM 1024
+
+char **namelist(void);
 
 /*
 * cmdsep -> ';' | '\n'
@@ -96,29 +102,49 @@ void body(void){
   imperative();
 }
 
-//declarative ->[ VAR namelist : vartype ; { namelist : vartype ;} ] { sbpmod sbpname parmdef  [ : fnctype ]; body } 
+/*declarative ->
+ * 		[ 
+ * 		  VAR namelist : vartype ;   || 
+ * 		  { namelist : vartype ;} 
+ * 		] 
+ * 		{ sbpmod sbpname parmdef  [ : fnctype ]; body } 
+
+*/
 void declarative(void){
+  
+  /*
+   * vardef -> VAR namelist ':' vartype ';' || vardef.symtab <- 
+   * 						forall symbol in namelist.name do
+   *							symtab_append(symbol,vartype.type)
+   *						end do 
+   * 
+   * 
+   */
+  
+  
   if(lookahead == VAR){
     match(VAR);
     do{
-      namelist();
+      /*[[*/ int type , i; /*]]*/
+     /*[[*/ char **namev = /*]]*/ namelist();
       match(':');
-      vartype();
+      /*[[*/ type =  /*]]*/ vartype();
+       /*[[*/ for(i=0;namev[i];i++)symtab_append(namev[i],type); /*]]*/
       match(';');
     }while(lookahead == ID);
     
-    while(lookahead == PROCEDURE || lookahead == FUNCTION){
-      match(lookahead);
-      match(ID);
-      parmdef();
-      if(lookahead == ':'){
-	match(':');
-	fnctype();
-	match(';');
-	body();
-	match(';');
-	
-      }
+  }
+  while(lookahead == PROCEDURE || lookahead == FUNCTION){
+    match(lookahead);
+    match(ID);
+    parmdef();
+    if(lookahead == ':'){
+      match(':');
+      fnctype();
+      match(';');
+      body();
+      match(';');
+      
     }
   }
 }
@@ -127,11 +153,17 @@ void declarative(void){
 
 
 void fnctype(void){
-    /*
-  *match(DEC);
-  *
-  *
-  */ 
+  
+    switch(lookahead){
+    case INTEGER:
+      match(INTEGER);
+      break;
+    case REAL:
+      match(REAL);
+      break;
+    default:
+      match(BOOLEAN);
+  } 
   
 }
 
@@ -159,11 +191,19 @@ void parmdef(void){
 }
 
 void vartype(void){
- /*
-  *match(DEC);
-  *
-  *
-  */ 
+
+  switch(lookahead){
+    case INTEGER:
+      match(INTEGER);
+      break;
+    case REAL:
+      match(REAL);
+      break;
+    default:
+      match(BOOLEAN);
+  }
+    
+    
 }
 
 
@@ -174,17 +214,28 @@ void imperative(void){
   match(END);
 }
 
+
+
 //namelist -> ID { , ID }
-void namelist(void){
-  match(ID);
-  while(lookahead == ','){
-   match(',');
-   match(ID);
-  }
+char **namelist(void)
+{
+ /*[[*/ char **symbolvec = (char **)calloc(MAX_ARG_NUM, sizeof(char **));
+  int i = 0;/*]]*/
+  _namelist_begin:
+    /*[[*/ strcpy(symbolvec[i] = malloc(sizeof lexeme +1), lexeme);
+    i++;/*]]*/
+    match(ID);
+    while(lookahead == ','){
+      match(',');
+      goto _namelist_begin;
+    }
+    
+   /*[[*/ return symbolvec; /*]]*/
 }
 
 void stmtlist(void){
   stmt();
+  
     while (lookahead == ';') {
         match(';');
         stmt();
@@ -207,16 +258,26 @@ void stmt(void) {
         case REPEAT:
             repeatstmt();
             break;         
-        case ID:  
+	case ID: /*hereafter we expect FIRST(expr):*/ 
             break;
+	    
+	case DEC:
+	    break;
+	case  '(':
+	  expr();
+	  break;
             /*                     | ""
              */
-        default:			
+        default:
+	  /*<empty>*/
             ;
-    } /*end switch */
+    }
 }
 
+
+
 void beginblock(void){
+  match(BEGIN);
   printf("BEGIN RECONHECIDO - IMPLEMENTAR AQUI");
 }
 
@@ -228,6 +289,10 @@ void whilestmt(void){
    printf("WHILE RECONHECIDO - IMPLEMENTAR AQUI");
 }
 
+/*
+ * repeatstmt -> REPEAT 
+ * 
+ */
 void repeatstmt(void){
    printf("REPEAT RECONHECIDO - IMPLEMENTAR AQUI");
 }
@@ -312,6 +377,9 @@ int addop (void)
     match('+'); return '+';
     case '-':
     match('-'); return '-';
+    case OR:
+    match(OR); return OR;
+    
   }
   return 0;
 }
@@ -324,6 +392,8 @@ int mulop (void)
     match('*'); return '*';
     case '/':
     match('/'); return '/';
+    case AND:
+      match(AND); return AND;
   }
   return 0;
 }
@@ -375,11 +445,17 @@ void constant (void)
 
 /* variable -> [[ print ID ]] ID */
 void variable (void)
-{/*[[*/char varname[MAXID_SIZE]/*]]*/;
+{
+  /*symbol must be declared*/
+    if(symtab_lookup(lexeme) == -1){
+	exit(-1);
+    }
+  
+  /*[[*/char varname[MAXID_SIZE]/*]]*/;
   /*[[*/strcpy(varname, lexeme)/*]]*/;
   match(ID);
-  if (lookahead == '=') {// L-VALUE:
-    match('=');
+  if (lookahead == ASGN) {// L-VALUE:
+    match(ASGN);// ASGN = ':='
     expr();
     /*[[*/store(varname)/*]]*/;
   } else { // R-VALUE:

@@ -2,7 +2,7 @@
 
 /*
 
-1: Tue Aug 16 20:49:40 BRT 2016
+Yuji - Modificado 25 de Outubro de 2016
 
 */
 
@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <tokens.h>
 #include <lexer.h>
+#include <keywords.c>
 
 void skipspaces (FILE *dish)
 {
@@ -23,17 +24,43 @@ void skipspaces (FILE *dish)
 
 char lexeme[MAXID_SIZE+1];//@ lexer.c
 
-int is_identifier(FILE *dish)
+int is_assign(FILE * tape){
+  
+  if((lexeme[0] = getc(tape)) == ':'){
+    if((lexeme[1] = getc(tape)) == '='){
+      lexeme[2] = 0;
+      return ASGN;
+    }
+    ungetc(lexeme[1], tape);
+    
+  }
+  ungetc(lexeme[0], tape);
+  return 0;
+}
+
+int is_identifier(FILE *tape)
 {
-  int i = 0;
-  lexeme[i] = getc(dish);
-  if (isalpha (lexeme[i]) ) {
-    for (i++; isalnum (lexeme[i] = getc(dish)); i++);
-    ungetc (lexeme[i], dish);
-    lexeme[i] = 0;
+  int token = 0;
+  lexeme[token] = getc(tape);
+  if (isalpha (lexeme[token]) ) {
+    
+    for(token = 1;isalnum(lexeme[token] = getc(tape)); token ++){
+      if(token == MAXID_SIZE){
+	break;
+      }
+    }
+	
+	
+    //for (token++; isalnum (lexeme[token] = getc(tape)); token++);
+    
+    
+    ungetc (lexeme[token], tape);
+    lexeme[token] = 0;
+    if(token = iskeyword(lexeme))
+	return token;
     return ID;
   }
-  ungetc (lexeme[i], dish);
+  ungetc (lexeme[token], tape);
   return 0;
 }
 
