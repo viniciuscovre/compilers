@@ -1,5 +1,7 @@
 /**@<vmachine.h>::**/
 
+#include <lexer.h>
+
 #define         MAXSYMTAB_ENTRIES       0x10000
 #define         MAXSTACK_SIZE           0x40
 
