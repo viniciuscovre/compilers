@@ -50,9 +50,9 @@ int is_identifier(FILE *tape)
     ungetc (lexeme[token], tape);
     lexeme[token] = 0;
 
-    if(token = iskeyword(lexeme))
+    if((token = iskeyword(lexeme)))
       return token;
-      
+
     return ID;
   }
   ungetc (lexeme[token], tape);

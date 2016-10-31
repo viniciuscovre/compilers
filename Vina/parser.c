@@ -44,10 +44,27 @@
 #include <parser.h>
 #include <lexer.h>
 #include <vmachine.h>
+#include <keywords.h>
+#include <symtab.h>
 
 #define MAX_ARG_NUM 1024
 
 char **namelist(void);
+void mypas(void);
+void body(void);
+void declarative(void);
+void fnctype(void);
+void parmdef(void);
+int vartype(void);
+void imperative(void);
+void stmtlist(void);
+void stmt(void);
+void beginblock(void);
+void ifstmt(void);
+void whilestmt(void);
+void repeatstmt(void);
+int octalToInt(char octalToConvert[]);
+int hexToInt(char hexToConvert[]);
 
 /*
 * cmdsep -> ';' | '\n'
@@ -188,19 +205,20 @@ void parmdef(void)
   match(')');
 }
 
-void vartype(void)
+int vartype(void)
 {
   switch(lookahead) {
     case INTEGER:
       match(INTEGER);
-      break;
+      return INTEGER;
 
     case REAL:
       match(REAL);
-      break;
+      return REAL;
 
     default:
       match(BOOLEAN);
+      return BOOLEAN;
   }
 }
 
@@ -477,7 +495,8 @@ void variable (void)
   }
 }
 
-int octalToInt(char octalToConvert[]){
+int octalToInt(char octalToConvert[])
+{
 
   int n = atoi(octalToConvert);
   int octal = 0, i = 0, rem;
