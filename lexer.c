@@ -2,7 +2,7 @@
 
 /*
 
-1: Tue Aug 16 20:49:40 BRT 2016
+Vina - Modificado 31 de Outubro de 2016
 
 */
 
@@ -11,32 +11,56 @@
 #include <ctype.h>
 #include <tokens.h>
 #include <lexer.h>
+#include <keywords.c>
 
 void skipspaces (FILE *dish)
 {
   int cake;
 
-  // while ( isspace ( cake = getc (dish) ) );
-  while ( isblank ( cake = getc (dish) ) );
+  while ( isspace ( cake = getc (dish) ) && cake != '\n' );
+  // while ( isblank ( cake = getc (dish) ) );
   ungetc ( cake, dish );
 }
 
 char lexeme[MAXID_SIZE+1];//@ lexer.c
 
-int is_identifier(FILE *dish)
-{
-  int i = 0;
-  lexeme[i] = getc(dish);
-  if (isalpha (lexeme[i]) ) {
-    for (i++; isalnum (lexeme[i] = getc(dish)); i++);
-    ungetc (lexeme[i], dish);
-    lexeme[i] = 0;
-    return ID;
+int is_assign(FILE * tape){
+
+  if((lexeme[0] = getc(tape)) == ':'){
+    if((lexeme[1] = getc(tape)) == '='){
+      lexeme[2] = 0;
+      return ASGN;
+    }
+    ungetc(lexeme[1], tape);
+
   }
-  ungetc (lexeme[i], dish);
+  ungetc(lexeme[0], tape);
   return 0;
 }
 
+// ID = [A-Za-z][A-Za-z0-9]*
+int is_identifier(FILE *tape)
+{
+  int token = 0;
+  lexeme[token] = getc(tape);
+  if (isalpha (lexeme[token]) ) {
+    for(token = 1; isalnum(lexeme[token] = getc(tape)); token ++) {
+      if(token == MAXID_SIZE)
+        break;
+    }
+    ungetc (lexeme[token], tape);
+    lexeme[token] = 0;
+
+    if((token = iskeyword(lexeme)))
+      return token;
+
+    return ID;
+  }
+  ungetc (lexeme[token], tape);
+  return 0;
+}
+
+// DEC = [1-9][0-9]* | 0
 int is_decimal(FILE *dish)
 {
   int i = 0;
@@ -72,6 +96,7 @@ int is_decimal(FILE *dish)
   return 0;
 }
 
+// OCTAL =  0[1-7][0-7]*
 int is_octal(FILE *dish)
 {
   int i = 0;
@@ -92,12 +117,13 @@ int is_octal(FILE *dish)
   return 0;
 }
 
+// HEX = 0[xX][0-9a-fA-F]+
 int is_hexadecimal(FILE *dish)
 {
   int i = 0;
   lexeme[i] = getc(dish);
   if (lexeme[i] == '0') {
-    if ( (lexeme[++i] = getc(dish)) == 'x'){
+    if ( tolower((lexeme[++i] = getc(dish))) == 'x'){
       lexeme[++i] = getc(dish);
       if ( isdigit(lexeme[i]) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') ) {
         while ( isdigit((lexeme[++i] = getc(dish))) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') );
@@ -123,80 +149,10 @@ int is_hexadecimal(FILE *dish)
   return 0;
 }
 
-// int is_float(FILE *dish)
-// {
-//   int i = 0;
-//   lexeme[i] = getc(dish);
-//   if (tolower(lexeme[i]) == 'e' || lexeme[i] == '.') {
-//     if (lexeme[i] == '.') {
-//       if ( isdigit((lexeme[++i] = getc(dish))) ) {
-//         while( isdigit(lexeme[++i]=getc(dish)) );
-//         if ( tolower(lexeme[i]) == 'e') { //VERIFYING EXP ~vina
-//           lexeme[++i] = getc(dish);
-//           // if(!isdigit(lexeme[i]) && lexeme[i] != '-' && lexeme[i] != '+' && lexeme[i] != EOF && lexeme[i] != EOL) {
-//           //   ungetc (lexeme[i], dish);
-//           //   return 0;
-//           // }
-//           if( lexeme[i] == '+' || lexeme[i] == '-' ) {
-//             lexeme[++i] = getc(dish);
-//             if (isdigit(lexeme[i])) {
-//               while( isdigit(lexeme[++i]=getc(dish)) );
-//               if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOL) {
-//                 ungetc (lexeme[i], dish);
-//                 return FLOAT;
-//               }
-//               ungetc (lexeme[i], dish);
-//               return 0;
-//             }
-//             ungetc (lexeme[i], dish);
-//             return 0;
-//           }
-//           if (lexeme[i] == EOF || lexeme[i] == EOL) {
-//             ungetc (lexeme[i], dish);
-//             return FLOAT;
-//           }
-//           if(isdigit(lexeme[i])) {
-//             while( isdigit(lexeme[++i]=getc(dish)) );
-//             if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOL) {
-//               ungetc (lexeme[i], dish);
-//               return FLOAT;
-//             }
-//             ungetc (lexeme[i], dish);
-//             return 0;
-//           }
-//           ungetc (lexeme[i], dish);
-//           return 0;
-//         } else if (isdigit(lexeme[i]) || lexeme[i] == EOF || lexeme[i] == EOL) {
-//           ungetc (lexeme[i], dish);
-//           return FLOAT;
-//         } else {
-//           ungetc (lexeme[i], dish);
-//           return 0;
-//         }
-//       }
-//       ungetc (lexeme[i], dish);
-//       return 0;
-//     } else { // (decimal ...) 'e' something ~vina
-//     lexeme[++i] = getc(dish);
-//     if(lexeme[i] == EOF || lexeme[i] == EOL) {
-//       ungetc(lexeme[i], dish);
-//       return FLOAT;
-//     }
-//     if( lexeme[i] == '+' || lexeme [i] == '-' || isdigit(lexeme[i]) ) {
-//       while( isdigit(lexeme[++i] = getc(dish)) );
-//       if (isdigit(lexeme[i-1])) {
-//         ungetc(lexeme[i], dish);
-//         return FLOAT;
-//       }
-//     }
-//     ungetc(lexeme[i], dish);
-//     return 0;
-//   }
-// }
-// ungetc (lexeme[i], dish);
-// return 0;
-// }
+/* FLOAT = ( DEC ‘.’ DIGIT* | ‘.’ DIGIT+ ) EXP? | DEC EXP
 
+DIGIT = [0-9]
+EXP =  ('E'|'e') (‘+’|‘-’)? DIGIT+  */
 int is_float(FILE *tape) {
 
   int i;
@@ -210,7 +166,7 @@ int is_float(FILE *tape) {
       ungetc(lexeme[i], tape);
       lexeme[i] = 0;
       return FLOAT;
-    } //else if ()  //verificar se é exp
+    } //else if ()  //verificar se é EXP
 
     ungetc(lexeme[i], tape);
     lexeme[i] = 0;
@@ -237,6 +193,9 @@ int gettoken (FILE *tokenstream)
 {
   int token;
   skipspaces (tokenstream);
+
+  token = is_assign(tokenstream);
+  if (token) return ASGN;
 
   token = is_identifier(tokenstream);
   if (token) return ID;

@@ -1,4 +1,4 @@
-/********************************** Recursive LL(1) Pareser *****************************************
+/********************** Recursive LL(1) Pareser **********************
 *
 * Method: assign nonterminal symbols to C-function names
 *
@@ -44,32 +44,349 @@
 #include <parser.h>
 #include <lexer.h>
 #include <vmachine.h>
+#include <keywords.h>
+#include <symtab.h>
+
+#define MAX_ARG_NUM 1024
+
+char **namelist(void);
+void mypas(void);
+void body(void);
+void declarative(void);
+void fnctype(void);
+void parmdef(void);
+int vartype(void);
+void imperative(void);
+void stmtlist(void);
+void stmt(void);
+void beginblock(void);
+void ifstmt(void);
+void whilestmt(void);
+void repeatstmt(void);
+void forstmt(void);
+int octalToInt(char octalToConvert[]);
+int hexToInt(char hexToConvert[]);
 
 /*
-* mypas -> expr { cmdsep expr } <eof>
-*
 * cmdsep -> ';' | '\n'
 */
 int iscmdsep(void)
 {
   switch(lookahead){
     case ';': case '\n':
-    match(lookahead); return 1;
+    match(lookahead);
+    return 1;
   }
   return 0;
 }
 
+/*
+*
+* mypas -> prgbody '.'
+*
+* prgbody -> declarative imperative
+*
+*
+* declarative ->[ VAR namelist : vartype ; { namelist : vartype } ]
+* 		{ sbpmod sbpname parmdef  [ : fnctype ]; body }
+*
+* sbmod -> PROCEDURE | FUNCTION
+*
+* sbpname -> ID
+*
+* namelist -> ID { , ID }
+*
+* parmdef -> [( [VAR] namelist ':' { ';' [VAR] namelist ':' vartype }) ]
+*
+*
+* imperative BEGIN stmtlist END
+*
+*/
+
+// mypas -> prgbody '.'
 void mypas(void)
 {
-  expr();/*[[*/printf("%g\n", acc)/*]]*/;
+  body();
+  match('.');
+  match(EOF); // VERIFY IF REALLY NECESSARY ~vina
+}
+
+//prgbody -> declarative imperative
+void body(void)
+{
+  declarative();
+  imperative();
+}
+
+/*declarative ->
+* 		[
+* 		  VAR namelist : vartype ;   ||
+* 		  { namelist : vartype ;}
+* 		]
+* 		{ sbpmod sbpname parmdef  [ : fnctype ]; body }
+
+*/
+void declarative(void)
+{
+  /*
+  * vardef -> VAR namelist ':' vartype ';' || vardef.symtab <-
+  * 						forall symbol in namelist.name do
+  *							symtab_append(symbol,vartype.type)
+  *						end do
+  *
+  *
+  */
+
+  if(lookahead == VAR) {
+    match(VAR);
+    do {
+      /*[[*/ int type , i /*]]*/;
+      /*[[*/ char **namev = /*]]*/ namelist();
+      match(':');
+      /*[[*/ type =  /*]]*/ vartype();
+      /*[[*/ for(i=0; namev[i]; i++) symtab_append(namev[i], type); /*]]*/
+      match(';');
+    } while(lookahead == ID);
+
+  }
+
+  while(lookahead == PROCEDURE || lookahead == FUNCTION) {
+    match(lookahead);
+    match(ID);
+    parmdef();
+    if(lookahead == ':') {
+      match(':');
+      fnctype();
+      match(';');
+      body();
+      match(';');
+    }
+  }
+
+}
+
+void fnctype(void)
+{
+  switch(lookahead) {
+    case INTEGER:
+      match(INTEGER);
+      break;
+
+    case REAL:
+      match(REAL);
+      break;
+
+    default:
+      match(BOOLEAN);
+  }
+
+}
+
+// * parmdef -> [( [VAR] namelist ':' { ';' [VAR] namelist ':' vartype }) ]
+void parmdef(void)
+{
+  if(lookahead == '(') {
+    match('(');
+    if(lookahead == VAR){
+      match(VAR);
+    }
+    namelist();
+    match(':');
+    while(lookahead == ';') {
+      match(';');
+      if(lookahead == VAR) {
+        match(VAR);
+      }
+      namelist();
+      match(':');
+      vartype();
+    }
+  }
+  match(')');
+}
+
+int vartype(void)
+{
+  switch(lookahead) {
+    case INTEGER:
+      match(INTEGER);
+      return INTEGER;
+
+    case REAL:
+      match(REAL);
+      return REAL;
+
+    default:
+      match(BOOLEAN);
+      return BOOLEAN;
+  }
+}
+
+// imperative BEGIN stmtlist END
+void imperative(void)
+{
+  match(BEGIN);
+  stmtlist();
+  match(END);
+}
+
+//namelist -> ID { , ID }
+char **namelist(void)
+{
+  /*[[*/ char **symbolvec = (char **)calloc(MAX_ARG_NUM, sizeof(char **));
+  int i = 0;/*]]*/
+  _namelist_begin:
+  /*[[*/ strcpy(symbolvec[i] = malloc(sizeof lexeme +1), lexeme); i++;/*]]*/
+  match(ID);
+  while(lookahead == ',') {
+    match(',');
+    goto _namelist_begin;
+  }
+
+  /*[[*/ return symbolvec; /*]]*/
+}
+
+//stmtlist -> stmt { ';' stmt }
+void stmtlist(void)
+{
+  stmt();
+  while (lookahead == ';') {
+    match(';');
+    stmt();
+  }
+}
+
+/* stmt -> beginblock
+          | ifstmt
+          | whilestmt
+          | repeatstmt
+          | forstmt
+          | fact
+*/
+void stmt(void)
+{
+  switch (lookahead) {
+    case BEGIN:
+      beginblock();
+      break;
+
+    case IF:
+      ifstmt();
+      break;
+
+    case WHILE:
+      whilestmt();
+      break;
+
+    case REPEAT:
+      repeatstmt();
+      break;
+
+    // see if FOR will be implemented (already in keywrods) ~vina
+    case FOR:
+      forstmt();
+      break;
+
+    case ID: /*hereafter we expect FIRST(expr):*/
+      break;
+
+    case DEC:
+      break;
+
+    case  '(':
+      expr();
+      break;
+    /*                     | ""
+    */
+
+    default:
+      /*<empty>*/
+      ;
+  }
+}
+
+//beginblock -> BEGIN stmt { ; stmt } END
+void beginblock(void)
+{
+  match(BEGIN);
+  stmt();
+  while(lookahead == ';') {
+    match(';');
+    stmt();
+  }
+  match(END);
+}
+
+//ifstmt -> IF expr THEN stmt [ ELSE stmt ] | other
+void ifstmt(void)
+{
+  match(IF);
+  expr();
+  match(THEN);
+  stmt();
+
+  if(lookahead == ELSE) {
+    match(ELSE);
+    stmt();
+  }
+
+}
+
+//whilestmt -> WHILE expr DO stmt
+void whilestmt(void)
+{
+  match(WHILE);
+  expr();
+  match(DO);
+  stmt();
+}
+
+//repeatstmt -> REPEAT stmt { ; stmt } UNTIL expr
+void repeatstmt(void)
+{
+  match(REPEAT);
+  stmt();
+  while(lookahead == ';') {
+    match(';');
+    stmt();
+  }
+  match(UNTIL);
+  expr();
+}
+
+//forstmt -> FOR variable ASGN expr (TO | DOWNTO) expr DO stmt
+void forstmt(void)
+{
+  match(FOR);
+  // printf("RECONHECE O FOR | IMPLEMENTAR AQUI /~vina");
+  variable();
+  match(ASGN);
+  expr();
+
+  // see if TO and DOWNTO will be implemented (already in keywrods) ~vina
+  if(lookahead == TO)
+    match(TO);
+  else
+    match(DOWNTO);
+
+  expr();
+  match(DO);
+  stmt();
+}
+
+/* mypas -> expr { cmdsep expr } <eof> */
+void mypas_old(void)
+{
+  expr();
+  /*[[*/printf("%g\n", acc)/*]]*/;
 
   while ( iscmdsep() ) {
-    if(lookahead!=-1)
-    {
+    if(lookahead!=-1) {
       expr();
       /*[[*/printf("%g\n", acc)/*]]*/;
     }
   }
+
   match(EOF);
 }
 
@@ -95,7 +412,10 @@ void term (void)
   }
 }
 
-/* fact -> variable | constant | ( expr ) */
+/* fact -> variable | constant | ( expr )
+
+variable -> ID
+constant -> DEC */
 void fact (void)
 {
   switch (lookahead) {
@@ -125,27 +445,42 @@ void arith (void)
   }
 }
 
-/* addop -> + | - */
+/* addop -> + | - | OR */
 int addop (void)
 {
   switch (lookahead)
   {
     case '+':
-    match('+'); return '+';
+      match('+');
+      return '+';
+
     case '-':
-    match('-'); return '-';
+      match('-');
+      return '-';
+
+    case OR:
+      match(OR);
+      return OR;
   }
   return 0;
 }
-/* mulop -> * | / */
+
+/* mulop -> * | / | AND */
 int mulop (void)
 {
   switch (lookahead)
   {
     case '*':
-    match('*'); return '*';
+      match('*');
+      return '*';
+
     case '/':
-    match('/'); return '/';
+      match('/');
+      return '/';
+
+    case AND:
+      match(AND);
+      return AND;
   }
   return 0;
 }
@@ -171,31 +506,31 @@ void constant (void)
   int value = -1; //starts with -1 to detect a possible further error
   switch(lookahead) {
 
-    case DEC:
-    /*[[*/cp2acc(atof(lexeme))/*]]*/;
-    match(DEC);
-    // /*[[*/printf("decimal: ")/*]]*/;
-    break;
+    // case DEC:
+    // /*[[*/cp2acc(atof(lexeme))/*]]*/;
+    // match(DEC);
+    // // /*[[*/printf("decimal: ")/*]]*/;
+    // break;
 
     case FLOAT:
-    /*[[*/cp2acc(atof(lexeme))/*]]*/;
-    match(FLOAT);
-    // /*[[*/printf("float: ")/*]]*/;
-    break;
+      /*[[*/cp2acc(atof(lexeme))/*]]*/;
+      match(FLOAT);
+      // /*[[*/printf("float: ")/*]]*/;
+      break;
 
     case OCTAL:
-    value = octalToInt(lexeme);
-    /*[[*/cp2acc((float)value)/*]]*/;
-    match(OCTAL);
-    // /*[[*/printf("octal value in decimal: ")/*]]*/;
-    break;
+      value = octalToInt(lexeme);
+      /*[[*/cp2acc((float)value)/*]]*/;
+      match(OCTAL);
+      // /*[[*/printf("octal value in decimal: ")/*]]*/;
+      break;
 
     case HEX:
-    value = hexToInt(lexeme);
-    /*[[*/cp2acc((float)value)/*]]*/;
-    match(HEX);
-    // /*[[*/printf("hexadecimal value in decimal: ")/*]]*/;
-    break;
+      value = hexToInt(lexeme);
+      /*[[*/cp2acc((float)value)/*]]*/;
+      match(HEX);
+      // /*[[*/printf("hexadecimal value in decimal: ")/*]]*/;
+      break;
 
     /* VRIFY DEFAULT CASE ~vina */
   }
@@ -203,11 +538,17 @@ void constant (void)
 
 /* variable -> [[ print ID ]] ID */
 void variable (void)
-{/*[[*/char varname[MAXID_SIZE]/*]]*/;
+{
+  /* symbol must be declared */
+  if(symtab_lookup(lexeme) == -1) {
+    exit(-1);
+  }
+
+  /*[[*/char varname[MAXID_SIZE]/*]]*/;
   /*[[*/strcpy(varname, lexeme)/*]]*/;
   match(ID);
-  if (lookahead == '=') {// L-VALUE:
-    match('=');
+  if (lookahead == ASGN) {// L-VALUE:
+    match(ASGN); // ASGN = ':='
     expr();
     /*[[*/store(varname)/*]]*/;
   } else { // R-VALUE:
@@ -215,7 +556,8 @@ void variable (void)
   }
 }
 
-int octalToInt(char octalToConvert[]){
+int octalToInt(char octalToConvert[])
+{
 
   int n = atoi(octalToConvert);
   int octal = 0, i = 0, rem;
@@ -257,8 +599,8 @@ void match (int expected_token)
   if (expected_token == lookahead) {
     lookahead = gettoken (source_code);
   } else {
-    fprintf (stderr, "parser: token mismatch error.\n");
-    fprintf (stderr, "expecting %d but seen %d... exting\n",
+    fprintf (stderr, "\nparser: token mismatch error.\n");
+    fprintf (stderr, "expecting %d but seen %d. Exting...\n",
     expected_token, lookahead);
     exit (SYNTAX_ERR);
   }

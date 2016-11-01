@@ -1,10 +1,17 @@
+#include <keywords.h>
+#include <string.h>
+
+char *keywords[] = {"begin","if","then","else","while","for","do","to","downto","repeat","until","var","procedure","function",
+  "integer","real","boolean","div","mod","and", "or","not", "end"};
+
+
 int iskeyword(char const *identifier)
 {
-  int i;
-  for(i = IF;i <= ENDWHILE;i++)
+  int token;
+  for(token = BEGIN;token <= END;token++)
   {
-    if(strcmp(keywords[i-IF]) == 0)
-      return i;
+    if(strcmp(keywords[token-IF],identifier) == 0)
+      return token;
   }
   return 0;
 }

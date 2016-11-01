@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-char symtab[MAXSYMTAB_ENTRIES][MAXID_SIZE+1];
-int symtab_nextentry = 0;
 double vmem[MAXSYMTAB_ENTRIES];
 double stack[MAXSTACK_SIZE];
 int sp = -1;
@@ -45,14 +43,15 @@ void recall(char const *symbol)
 
 /* Looks for the symbol in the table...
 If it is in there, return the position
-Otherwise, place it (done in the caller function, ie: recall) ~vina */
+Otherwise, place it (done in the caller function, ie: recall) ~vina
 int symtab_lookup(char const *symbol)
 {
   int i;
   for(i = 0; i < symtab_nextentry && strcmp(symtab[i], symbol); i++);
-  if (i == symtab_nextentry) return -1; /* The symbol is not in the table. Needs to insert it ~vina */
-  return i; /* Return the position where the symbol is ~vina */
-}
+  if (i == symtab_nextentry)
+    return -1; // The symbol is not in the table. Needs to insert it ~vina
+  return i; // Return the position where the symbol is ~vina
+} */
 
 void store(char const *symbol)
 {
@@ -72,29 +71,29 @@ void operationlib(int op)
   //int temp;
   switch(op) {
     case '+':
-    acc += stack[sp];
-    sp--;
-    break;
+      acc += stack[sp];
+      sp--;
+      break;
 
     case '*':
-    acc *= stack[sp];
-    sp--;
-    break;
+      acc *= stack[sp];
+      sp--;
+      break;
 
     case '-':
-    stack[sp] -= acc;
-    accpop();
-    break;
+      stack[sp] -= acc;
+      accpop();
+      break;
 
     case '/':
-    stack[sp] /= acc;
-    accpop();
-    break;
+      stack[sp] /= acc;
+      accpop();
+      break;
 
     case '>':
-    if (acc > stack[sp]) acc = 1;
-    else acc = 0;
-    break;
-
+      if (acc > stack[sp])
+        acc = 1;
+      else acc = 0;
+      break;
   }
 }
