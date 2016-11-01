@@ -21,3 +21,5 @@ DONE
 - cmdsep deve ter os casos de ";" e "/n" FEITO ~William
 - token mismatch quando acaba com ";" FEITO ~William
 - - na função gettoken - alterar "tokenstream" para "sourcecode" FEITO -William
+
+http://primepuzzle.com/tp2/syntax-diagrams.html
