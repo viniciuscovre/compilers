@@ -38,6 +38,7 @@ int is_assign(FILE * tape){
   return 0;
 }
 
+// ID = [A-Za-z][A-Za-z0-9]*
 int is_identifier(FILE *tape)
 {
   int token = 0;
@@ -59,6 +60,7 @@ int is_identifier(FILE *tape)
   return 0;
 }
 
+// DEC = [1-9][0-9]* | 0
 int is_decimal(FILE *dish)
 {
   int i = 0;
@@ -94,6 +96,7 @@ int is_decimal(FILE *dish)
   return 0;
 }
 
+// OCTAL =  0[1-7][0-7]*
 int is_octal(FILE *dish)
 {
   int i = 0;
@@ -114,12 +117,13 @@ int is_octal(FILE *dish)
   return 0;
 }
 
+// HEX = 0[xX][0-9a-fA-F]+
 int is_hexadecimal(FILE *dish)
 {
   int i = 0;
   lexeme[i] = getc(dish);
   if (lexeme[i] == '0') {
-    if ( (lexeme[++i] = getc(dish)) == 'x'){
+    if ( tolower((lexeme[++i] = getc(dish))) == 'x'){
       lexeme[++i] = getc(dish);
       if ( isdigit(lexeme[i]) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') ) {
         while ( isdigit((lexeme[++i] = getc(dish))) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') );
@@ -145,6 +149,10 @@ int is_hexadecimal(FILE *dish)
   return 0;
 }
 
+/* FLOAT = ( DEC ‘.’ DIGIT* | ‘.’ DIGIT+ ) EXP? | DEC EXP
+
+DIGIT = [0-9]
+EXP =  ('E'|'e') (‘+’|‘-’)? DIGIT+  */
 int is_float(FILE *tape) {
 
   int i;
@@ -158,7 +166,7 @@ int is_float(FILE *tape) {
       ungetc(lexeme[i], tape);
       lexeme[i] = 0;
       return FLOAT;
-    } //else if ()  //verificar se é exp
+    } //else if ()  //verificar se é EXP
 
     ungetc(lexeme[i], tape);
     lexeme[i] = 0;
@@ -185,6 +193,9 @@ int gettoken (FILE *tokenstream)
 {
   int token;
   skipspaces (tokenstream);
+
+  token = is_assign(tokenstream);
+  if (token) return ASGN;
 
   token = is_identifier(tokenstream);
   if (token) return ID;
