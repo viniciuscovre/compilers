@@ -63,6 +63,7 @@ void beginblock(void);
 void ifstmt(void);
 void whilestmt(void);
 void repeatstmt(void);
+void forstmt(void);
 int octalToInt(char octalToConvert[]);
 int hexToInt(char hexToConvert[]);
 
@@ -89,8 +90,6 @@ int iscmdsep(void)
 * declarative ->[ VAR namelist : vartype ; { namelist : vartype } ]
 * 		{ sbpmod sbpname parmdef  [ : fnctype ]; body }
 *
-*
-*
 * sbmod -> PROCEDURE | FUNCTION
 *
 * sbpname -> ID
@@ -109,6 +108,7 @@ void mypas(void)
 {
   body();
   match('.');
+  match(EOF); // VERIFY IF REALLY NECESSARY ~vina
 }
 
 //prgbody -> declarative imperative
@@ -256,6 +256,13 @@ void stmtlist(void)
   }
 }
 
+/* stmt -> beginblock
+          | ifstmt
+          | whilestmt
+          | repeatstmt
+          | forstmt
+          | fact
+*/
 void stmt(void)
 {
   switch (lookahead) {
@@ -273,6 +280,11 @@ void stmt(void)
 
     case REPEAT:
       repeatstmt();
+      break;
+
+    // see if FOR will be implemented (already in keywrods) ~vina
+    case FOR:
+      forstmt();
       break;
 
     case ID: /*hereafter we expect FIRST(expr):*/
@@ -293,28 +305,73 @@ void stmt(void)
   }
 }
 
+//beginblock -> BEGIN stmt { ; stmt } END
 void beginblock(void)
 {
   match(BEGIN);
-  printf("BEGIN RECONHECIDO - IMPLEMENTAR AQUI");
+  stmt();
+  while(lookahead == ';') {
+    match(';');
+    stmt();
+  }
+  match(END);
 }
 
+//ifstmt -> IF expr THEN stmt [ ELSE stmt ] | other
 void ifstmt(void)
 {
-  printf("IF RECONHECIDO - IMPLEMENTAR AQUI");
+  match(IF);
+  expr();
+  match(THEN);
+  stmt();
+
+  if(lookahead == ELSE) {
+    match(ELSE);
+    stmt();
+  }
+
 }
 
+//whilestmt -> WHILE expr DO stmt
 void whilestmt(void)
 {
-  printf("WHILE RECONHECIDO - IMPLEMENTAR AQUI");
+  match(WHILE);
+  expr();
+  match(DO);
+  stmt();
 }
 
-/*
-* repeatstmt -> REPEAT
-*
-*/
-void repeatstmt(void){
-  printf("REPEAT RECONHECIDO - IMPLEMENTAR AQUI");
+//repeatstmt -> REPEAT stmt { ; stmt } UNTIL expr
+void repeatstmt(void)
+{
+  match(REPEAT);
+  stmt();
+  while(lookahead == ';') {
+    match(';');
+    stmt();
+  }
+  match(UNTIL);
+  expr();
+}
+
+//forstmt -> FOR variable ASGN expr (TO | DOWNTO) expr DO stmt
+void forstmt(void)
+{
+  match(FOR);
+  // printf("RECONHECE O FOR | IMPLEMENTAR AQUI /~vina");
+  variable();
+  match(ASGN);
+  expr();
+
+  // see if TO and DOWNTO will be implemented (already in keywrods) ~vina
+  if(lookahead == TO)
+    match(TO);
+  else
+    match(DOWNTO);
+
+  expr();
+  match(DO);
+  stmt();
 }
 
 /* mypas -> expr { cmdsep expr } <eof> */
@@ -355,7 +412,10 @@ void term (void)
   }
 }
 
-/* fact -> variable | constant | ( expr ) */
+/* fact -> variable | constant | ( expr )
+
+variable -> ID
+constant -> DEC */
 void fact (void)
 {
   switch (lookahead) {
@@ -385,7 +445,7 @@ void arith (void)
   }
 }
 
-/* addop -> + | - */
+/* addop -> + | - | OR */
 int addop (void)
 {
   switch (lookahead)
@@ -404,7 +464,8 @@ int addop (void)
   }
   return 0;
 }
-/* mulop -> * | / */
+
+/* mulop -> * | / | AND */
 int mulop (void)
 {
   switch (lookahead)
