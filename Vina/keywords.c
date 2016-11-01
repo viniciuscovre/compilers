@@ -1,7 +1,7 @@
 #include <keywords.h>
 #include <string.h>
 
-char *keywords[] = {"begin","if","then","else","while","do","repeat","until","var","procedure","function",
+char *keywords[] = {"begin","if","then","else","while","for","do","to","downto","repeat","until","var","procedure","function",
   "integer","real","boolean","div","mod","and", "or","not", "end"};
 
 
