@@ -1,8 +1,9 @@
 #include <keywords.h>
 #include <string.h>
 
-char *keywords[] = {"begin","if","then","else","while","for","do","to","downto","repeat","until","var","procedure","function",
-  "integer","real","boolean","div","mod","and", "or","not", "end"};
+char *keywords[] = {"begin","if","then","else","while","for","do","to",
+"downto","repeat","until","var","procedure","function","integer","real",
+"boolean","div","mod","and", "or","not", "end"};
 
 
 int iskeyword(char const *identifier)
