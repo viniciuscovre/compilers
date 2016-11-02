@@ -17,10 +17,15 @@ FILE *source_code;
 char palavra_de_saida[] = "done";
 extern int lookahead; // @ parser.c
 
+FILE *source, *object;
+
 int main (int argc, char *argv[], char *envp[])
 {
+  object = stdout;
   if (argc == 1) {
-    //para remover o modo de leitura de comandos direto do terminal comente as 2 linhas seguintes e descomente a terceira linha seguinte
+    /* para remover o modo de leitura de comandos direto do terminal
+    comente as 2 linhas seguintes e descomente a terceira
+    linha seguinte */
     leitura_comandos();
     source_code = fopen("comandos","r");
     //source_code = stdin;
@@ -32,9 +37,14 @@ int main (int argc, char *argv[], char *envp[])
       exit (-1);
     }
   }
-
+    // int c;
+    // if (tape) {
+    //   while ((c = getc(tape)) != EOF)
+    //       putchar(c);
+    //   fclose(tape);
+    // }
   lookahead = gettoken (source_code);
-  // printf("||| lookahead: %c |||\n", lookahead);
+   printf("||| lookahead: %d |||\n", lookahead);
   mypas ();
 
   printf("\n");

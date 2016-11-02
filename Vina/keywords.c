@@ -6,13 +6,19 @@ char *keywords[] = {"begin","if","then","else","while","for","do","to",
 "boolean","div","mod","and", "or","not", "end"};
 
 
-int iskeyword(char const *identifier)
+int iskeyword(const char *identifier)
 {
-  int token;
-  for(token = BEGIN;token <= END;token++)
-  {
-    if(strcmp(keywords[token-IF],identifier) == 0)
-      return token;
+  // int token;
+  printf("%d", sizeof(keywords)/sizeof(*keywords));
+  int token = BEGIN;
+  while(token<=END) {
+      if(strcmp(keywords[END-token],identifier) == 0)
+        return token;
+      token++;
   }
+  // for(token = BEGIN;token <= END;token++) {
+  //   if(strcmp(keywords[END-token],identifier) == 0)
+  //     return token;
+  // }
   return 0;
 }

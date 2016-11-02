@@ -46,6 +46,7 @@
 #include <vmachine.h>
 #include <keywords.h>
 #include <symtab.h>
+#include <mypas.h>
 
 #define MAX_ARG_NUM 1024
 
@@ -108,14 +109,14 @@ void mypas(void)
 {
   body();
   match('.');
-  match(EOF); // VERIFY IF REALLY NECESSARY ~vina
+  // match(EOF); // VERIFY IF REALLY NECESSARY ~vina
 }
 
 //prgbody -> declarative imperative
 void body(void)
 {
-  declarative();
-  imperative();
+  declarative(); // simbolos serao declarados aqui
+  imperative(); // simbolos serao usados aqui
 }
 
 /*declarative ->
@@ -225,7 +226,9 @@ int vartype(void)
 // imperative BEGIN stmtlist END
 void imperative(void)
 {
+  printf("antes de match begin: %d\n", lookahead);
   match(BEGIN);
+  printf("\ndepois de match begin: %d\n", lookahead);
   stmtlist();
   match(END);
 }
@@ -243,7 +246,7 @@ char **namelist(void)
     goto _namelist_begin;
   }
 
-  /*[[*/ return symbolvec; /*]]*/
+  /*[[*/ return symbolvec /*]]*/;
 }
 
 //stmtlist -> stmt { ';' stmt }
@@ -288,9 +291,11 @@ void stmt(void)
       break;
 
     case ID: /*hereafter we expect FIRST(expr):*/
+      expr();
       break;
 
     case DEC:
+      expr();
       break;
 
     case  '(':
@@ -391,15 +396,124 @@ void mypas_old(void)
 }
 
 /* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
-void expr (void)
-{/*[[*/int opsymbol;/*]]*/
-  term();
-  while((opsymbol=addop())) {
-    /*[[*/accpush()/*]]*/;
-    term();
-    /*[[*/operationlib(opsymbol)/*]]*/;
+/* expr -> ['-'] term { addop term } */ //como ta na do eraldo
+/*
+ * regras de checagem de tipos (e de herança de tipos)...
+ *
+ *  OP      |  BOOLEAN    |   NUMERIC
+ * =====================================
+ *  NOT     |     X       |     N/A
+ *  OR      |     X       |     N/A
+ *  AND     |     X       |     N/A
+ *  NEG     |    N/A      |      X     // mudança de sinal
+ *  '+''-'  |    N/A      |      X
+ *  '*''/'  |    N/A      |      X
+ *  DIV     |    N/A      |   INTEGER
+ *  MOD     |    N/A      |   INTEGER
+ *  RELOP   | BOOL x BOOL |  NUM x NUM
+ *
+ * _EXPRESSIONS_  ||  INTEGER   |     REAL    |   DOUBLE
+ * ========================================================
+ *  INTEGER       |   INTEGER   |     REAL    |   DOUBLE
+ *  REAL          |    REAL     |     REAL    |   DOUBLE
+ *  DOUBLE        |   DOUBLE    |    DOUBLE   |   DOUBLE
+ *
+ *
+ *  _LVALUE_  || BOOLEAN | INTEGER |   REAL  |   DOUBLE
+ * =======================================================
+ *  BOOLEAN   |  BOOLEAN |   N/A   |   N/A   |    N/A
+ *  INTEGER   |    N/A   | INTEGER |   N/A   |    N/A
+ *  REAL      |    N/A   |   REAL  |   REAL  |    N/A
+ *  DOUBLE    |    N/A   |  DOUBLE |  DOUBLE |   DOUBLE
+ *
+ *  TUDO ISSO TEM Q VIRAR IF DENTRO DA EXPRESSAO
+ */
+int expr(int inherited_type)
+{
+  /*[[*/int varlocality, lvalue = 0, acctype = inherited_type/*]]*/;
+
+  if(lookahead == '-'){
+    match('-');
+    /*[[*/
+    if(acctype == BOOLEAN) {
+      fprintf(stderr, "incompatible unary operator: fatal error.\n");
+    } else if (acctype == 0) {
+      acctype = INTEGER;
+    }
+    /*]]*/
+  } else if (lookahead == NOT){
+    match(NOT);
+    /*[[*/
+    if(acctype > BOOLEAN) {
+      fprintf(stderr, "incompatible unary operator: fatal error.\n");
+    }
+    acctype = BOOLEAN;
+    /*]]*/
   }
+
+  T_entry:
+  F_entry:
+    switch(lookahead){
+
+      case ID:
+        /*[[*/
+        varlocality = symtab_lookup(lexeme);
+        if(varlocality < 0) {
+          fprintf(stderr, "parser: %s not declared... fatal error!\n",
+            lexeme);
+        }
+        /*]]*/
+        match(ID);
+        if (lookahead == ASGN) {
+          /* located variable is LVALUE */
+          /*]]*/ lvalue = 1 /*]]*/;
+          match(ASGN);
+          expr();
+        }
+        /*[[*/
+        else if(varlocality > -1) {
+          fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
+            symtab_stream + symtab[varlocality][0]);
+        }
+        /*]]*/
+        break;
+
+      case FLOAT:
+        match(FLOAT);
+        break;
+
+      case DEC:
+        match(DEC);
+        break;
+
+      default:
+        match('(');
+        expr();
+        match(')');
+    }
+
+    if(mulop())
+      goto F_entry;
+    if(addop())
+      goto T_entry;
+    /* expression ends down here */
+    /*[[*/
+    if(lvalue && varlocality > -1) {
+      fprintf(object, "\tmovl %%eax,%s\n",symtab_stream + symtab[varlocality][0]);
+    }
+    /*]]*/
 }
+
+/* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
+// void expr (void)
+// {/*[[*/int opsymbol;/*]]*/
+//   term();
+//   while((opsymbol=addop())) {
+//     /*[[*/accpush()/*]]*/;
+//     term();
+//     /*[[*/operationlib(opsymbol)/*]]*/;
+//   }
+// }
 
 /* term -> fact { mulop fact [[ print mulop.pf ]] } */
 void term (void)

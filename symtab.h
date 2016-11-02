@@ -7,3 +7,4 @@
 extern int symtab_append(char const *name, int type);
 
 extern int symtab_lookup(char const *name);
+extern char symtab_stream[];
