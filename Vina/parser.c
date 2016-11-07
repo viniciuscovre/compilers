@@ -51,22 +51,6 @@
 #define MAX_ARG_NUM 1024
 
 char **namelist(void);
-void mypas(void);
-void body(void);
-void declarative(void);
-void fnctype(void);
-void parmdef(void);
-int vartype(void);
-void imperative(void);
-void stmtlist(void);
-void stmt(void);
-void beginblock(void);
-void ifstmt(void);
-void whilestmt(void);
-void repeatstmt(void);
-void forstmt(void);
-int octalToInt(char octalToConvert[]);
-int hexToInt(char hexToConvert[]);
 
 /*
 * cmdsep -> ';' | '\n'
@@ -291,15 +275,15 @@ void stmt(void)
       break;
 
     case ID: /*hereafter we expect FIRST(expr):*/
-      expr();
+      expr(ID);
       break;
 
     case DEC:
-      expr();
+      expr(DEC);
       break;
 
     case  '(':
-      expr();
+      expr(DEC); //DEC??
       break;
     /*                     | ""
     */
@@ -326,7 +310,7 @@ void beginblock(void)
 void ifstmt(void)
 {
   match(IF);
-  expr();
+  expr(IF);
   match(THEN);
   stmt();
 
@@ -341,7 +325,7 @@ void ifstmt(void)
 void whilestmt(void)
 {
   match(WHILE);
-  expr();
+  expr(WHILE);
   match(DO);
   stmt();
 }
@@ -356,7 +340,7 @@ void repeatstmt(void)
     stmt();
   }
   match(UNTIL);
-  expr();
+  expr(DEC); //??
 }
 
 //forstmt -> FOR variable ASGN expr (TO | DOWNTO) expr DO stmt
@@ -366,7 +350,7 @@ void forstmt(void)
   // printf("RECONHECE O FOR | IMPLEMENTAR AQUI /~vina");
   variable();
   match(ASGN);
-  expr();
+  expr(DEC);
 
   // see if TO and DOWNTO will be implemented (already in keywrods) ~vina
   if(lookahead == TO)
@@ -374,7 +358,7 @@ void forstmt(void)
   else
     match(DOWNTO);
 
-  expr();
+  expr(DEC);
   match(DO);
   stmt();
 }
@@ -382,12 +366,12 @@ void forstmt(void)
 /* mypas -> expr { cmdsep expr } <eof> */
 void mypas_old(void)
 {
-  expr();
+  expr(DEC);
   /*[[*/printf("%g\n", acc)/*]]*/;
 
   while ( iscmdsep() ) {
     if(lookahead!=-1) {
-      expr();
+      expr(DEC);
       /*[[*/printf("%g\n", acc)/*]]*/;
     }
   }
@@ -468,7 +452,7 @@ int expr(int inherited_type)
           /* located variable is LVALUE */
           /*]]*/ lvalue = 1 /*]]*/;
           match(ASGN);
-          expr();
+          expr(DEC);
         }
         /*[[*/
         else if(varlocality > -1) {
@@ -488,7 +472,7 @@ int expr(int inherited_type)
 
       default:
         match('(');
-        expr();
+        expr(DEC);
         match(')');
     }
 
@@ -538,7 +522,7 @@ void fact (void)
     variable(); break;
 
     case '(':
-    match('('); expr(); match(')');break;
+    match('('); expr(DEC); match(')');break;
 
     case '>':
     match('>'); arith(); match(')');break;
@@ -663,7 +647,7 @@ void variable (void)
   match(ID);
   if (lookahead == ASGN) {// L-VALUE:
     match(ASGN); // ASGN = ':='
-    expr();
+    expr(DEC);
     /*[[*/store(varname)/*]]*/;
   } else { // R-VALUE:
     /*[[*/recall(varname)/*]]*/;

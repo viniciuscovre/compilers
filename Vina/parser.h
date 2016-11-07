@@ -36,7 +36,7 @@
  */
 
 /* expr -> term rest */
-void expr (void);
+int expr(int inherited_type);
 /* term -> fact quoc */
 void term (void);
 /* rest -> addop term rest | <> */
@@ -57,6 +57,23 @@ void variable (void);
 void arith (void);
 
 int arithmetic_op (void);
+
+void mypas(void);
+void body(void);
+void declarative(void);
+void fnctype(void);
+void parmdef(void);
+int vartype(void);
+void imperative(void);
+void stmtlist(void);
+void stmt(void);
+void beginblock(void);
+void ifstmt(void);
+void whilestmt(void);
+void repeatstmt(void);
+void forstmt(void);
+int octalToInt(char octalToConvert[]);
+int hexToInt(char hexToConvert[]);
 
 /******************************* lexer-to-parser interface *****************************************/
 
