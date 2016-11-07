@@ -9,7 +9,7 @@ char *keywords[] = {"begin","if","then","else","while","for","do","to",
 int iskeyword(const char *identifier)
 {
   // int token;
-  printf("%d", sizeof(keywords)/sizeof(*keywords));
+  printf("%lu", sizeof(keywords)/sizeof(*keywords));
   int token = BEGIN;
   while(token<=END) {
       if(strcmp(keywords[END-token],identifier) == 0)
