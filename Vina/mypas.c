@@ -44,7 +44,7 @@ int main (int argc, char *argv[], char *envp[])
     //   fclose(tape);
     // }
   lookahead = gettoken (source_code);
-   printf("||| lookahead: %d |||\n", lookahead);
+  printf("||| lookahead: %d |||\n", lookahead);
   mypas ();
 
   printf("\n");
