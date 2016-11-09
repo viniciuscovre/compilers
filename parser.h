@@ -37,6 +37,7 @@
 
 /* expr -> term rest */
 int expr(int inherited_type);
+int superexpr(int inherited_type);
 /* term -> fact quoc */
 void term (void);
 /* rest -> addop term rest | <> */

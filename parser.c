@@ -341,7 +341,7 @@ void repeatstmt(void)
     stmt();
   }
   match(UNTIL);
-  superexpr(BOOLEAN); 
+  superexpr(BOOLEAN);
 }
 
 /* mypas -> expr { cmdsep expr } <eof> */
@@ -384,7 +384,7 @@ void mypas_old(void)
  *  DOUBLE        |   DOUBLE    |    DOUBLE   |   DOUBLE
  *
  * iscompatible...
- * 
+ *
  *  _LVALUE_  || BOOLEAN | INTEGER |   REAL  |   DOUBLE
  * =======================================================
  *  BOOLEAN   |  BOOLEAN |   N/A   |   N/A   |    N/A
@@ -398,13 +398,13 @@ void mypas_old(void)
 int iscompatible(int ltype, int rtype)
 {
   switch(ltype) {
-    
+
     case BOOLEAN:
     case INTEGER:
       if(rtype == ltype)
 	return ltype;
       break;
-      
+
     case REAL:
       switch(rtype) {
 	case INTEGER:
@@ -412,7 +412,7 @@ int iscompatible(int ltype, int rtype)
 	  return ltype;
       }
       break;
-      
+
     case DOUBLE:
       switch(rtype) {
 	case INTEGER:
@@ -434,8 +434,8 @@ int isrelop(void)
 	return GEQ; //greater or equal
       }
       return '>';
-      
-    case '<': 
+
+    case '<':
       match('<');
       if(lookahead == '>') {
 	match('>');
@@ -446,7 +446,7 @@ int isrelop(void)
 	return LEQ; //less or equal
       }
       return '<';
-      
+
     case '=':
       match('=');
       return '=';
@@ -471,7 +471,7 @@ int superexpr(int inherited_type)
 
 int expr(int inherited_type)
 {
-  /*[[*/int 
+  /*[[*/int
 	  varlocality,
 	  lvalue_seen = 0,
 	  acctype = inherited_type,
@@ -516,7 +516,7 @@ int expr(int inherited_type)
         match(ID);
         if (lookahead == ASGN) {
           /* located variable is LVALUE */
-          /*[[*/ 
+          /*[[*/
 	  lvalue_seen = 1;
 	  ltype = syntype;
 	  /*]]*/
@@ -525,13 +525,13 @@ int expr(int inherited_type)
           rtype =
 	  /*]]*/
 	  superexpr(/*[[*/ltype/*]]*/);
-	  
+
 	  /*[[*/
 	  if(iscompatible(ltype, rtype)) {
 	    acctype = max(rtype,acctype);
 	  } else {
 	    acctype = -1;
-	  } 
+	  }
 	  /*]]*/
 	}
         /*[[*/
@@ -539,11 +539,11 @@ int expr(int inherited_type)
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
         }
-        
+
         /*else {
 	  syntype = symtab[varlocality][1];
 	}*/
-	
+
         /*]]*/
         break;
 
@@ -558,7 +558,7 @@ int expr(int inherited_type)
       default:
         match('(');
 	/*[[*/syntype = /*]]*/
-        superexpr(0); 
+        superexpr(0);
 	//superexpr --> pode ter um operador relacional
 	//expr --> nao pode ter operador relacional a não ser que dentro de parentesis
 	/*[[*/
@@ -581,6 +581,7 @@ int expr(int inherited_type)
       fprintf(object, "\tmovl %%eax,%s\n",symtab_stream + symtab[varlocality][0]);
     }
     /*]]*/
+    return 0;
 }
 
 /* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */

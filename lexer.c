@@ -17,7 +17,7 @@ void skipspaces (FILE *tape)
 {
   int cake;
 
-  while ( isspace ( cake = getc (tape) ) && cake != (' ' || '\n' || '\t') );
+  while ( isspace ( cake = getc (tape) ) && cake != (' ' | '\n' | '\t') );
   ungetc ( cake, tape );
 }
 
