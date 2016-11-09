@@ -1,6 +1,26 @@
-enum {BEGIN = 0x4097 ,IF, THEN, ELSE, WHILE, FOR, DO, TO, DOWNTO, REPEAT,
-  UNTIL,VAR, PROCEDURE, FUNCTION, INTEGER, REAL, BOOLEAN, DIV, MOD, AND,
-  OR, NOT, END};
+enum {
+  BEGIN = 0x4097,
+  IF,
+  THEN,
+  ELSE,
+  WHILE,
+  DO,
+  REPEAT,
+  UNTIL,
+  VAR,
+  BOOLEAN,
+  INTEGER,
+  REAL,
+  DOUBLE,
+  DIV,
+  MOD,
+  AND,
+  OR,
+  NOT,
+  TRUE,
+  FALSE,
+  END
+};
 
 extern char *keywords[];
 extern int iskeyword(char const *identifier);

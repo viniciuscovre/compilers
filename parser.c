@@ -47,26 +47,11 @@
 #include <keywords.h>
 #include <symtab.h>
 #include <mypas.h>
+#include <macros.h>
 
 #define MAX_ARG_NUM 1024
 
 char **namelist(void);
-void mypas(void);
-void body(void);
-void declarative(void);
-void fnctype(void);
-void parmdef(void);
-int vartype(void);
-void imperative(void);
-void stmtlist(void);
-void stmt(void);
-void beginblock(void);
-void ifstmt(void);
-void whilestmt(void);
-void repeatstmt(void);
-void forstmt(void);
-int octalToInt(char octalToConvert[]);
-int hexToInt(char hexToConvert[]);
 
 /*
 * cmdsep -> ';' | '\n'
@@ -151,6 +136,7 @@ void declarative(void)
 
   }
 
+/*
   while(lookahead == PROCEDURE || lookahead == FUNCTION) {
     match(lookahead);
     match(ID);
@@ -163,7 +149,7 @@ void declarative(void)
       match(';');
     }
   }
-
+*/
 }
 
 void fnctype(void)
@@ -226,9 +212,7 @@ int vartype(void)
 // imperative BEGIN stmtlist END
 void imperative(void)
 {
-  printf("antes de match begin: %d\n", lookahead);
   match(BEGIN);
-  printf("\ndepois de match begin: %d\n", lookahead);
   stmtlist();
   match(END);
 }
@@ -285,27 +269,20 @@ void stmt(void)
       repeatstmt();
       break;
 
-    // see if FOR will be implemented (already in keywrods) ~vina
-    case FOR:
-      forstmt();
+    /*hereafter we expect FIRST(expr):*/
+    case ID: //tokens
+    case FLOAT: //tokens
+    case INTEGER: //tokens // mudar de dec para integer ou INTCONST
+    case TRUE: //keywords
+    case FALSE: //keywords
+    case NOT: //keywords
+    case '-':
+    case '(':
+      expr(0);
       break;
-
-    case ID: /*hereafter we expect FIRST(expr):*/
-      expr();
-      break;
-
-    case DEC:
-      expr();
-      break;
-
-    case  '(':
-      expr();
-      break;
-    /*                     | ""
-    */
 
     default:
-      /*<empty>*/
+      /*<epsilon>*/
       ;
   }
 }
@@ -322,18 +299,26 @@ void beginblock(void)
   match(END);
 }
 
-//ifstmt -> IF expr THEN stmt [ ELSE stmt ] | other
+//ifstmt -> IF superexpr THEN stmt [ ELSE stmt ] | other
+int labelcounter = 1;
 void ifstmt(void)
 {
+  int _endif, _else;
+  int syntype;
   match(IF);
-  expr();
+  syntype = superexpr(BOOLEAN); //-> <superexpr>asm
+  fprintf(object, "\tjz .L%d\n", _endif = _else = labelcounter++);
+  //TODO: verif se o tipo sintetizado é compatível com o tipo herdado
   match(THEN);
   stmt();
-
   if(lookahead == ELSE) {
     match(ELSE);
+    _endif = labelcounter++;
+    fprintf(object, "\tjmp .L%d\n", _endif);
+    fprintf(object, ".L%d\n", _else);
     stmt();
   }
+  fprintf(object, ".L%d\n", _endif);
 
 }
 
@@ -341,7 +326,7 @@ void ifstmt(void)
 void whilestmt(void)
 {
   match(WHILE);
-  expr();
+  superexpr(BOOLEAN);
   match(DO);
   stmt();
 }
@@ -356,38 +341,18 @@ void repeatstmt(void)
     stmt();
   }
   match(UNTIL);
-  expr();
-}
-
-//forstmt -> FOR variable ASGN expr (TO | DOWNTO) expr DO stmt
-void forstmt(void)
-{
-  match(FOR);
-  // printf("RECONHECE O FOR | IMPLEMENTAR AQUI /~vina");
-  variable();
-  match(ASGN);
-  expr();
-
-  // see if TO and DOWNTO will be implemented (already in keywrods) ~vina
-  if(lookahead == TO)
-    match(TO);
-  else
-    match(DOWNTO);
-
-  expr();
-  match(DO);
-  stmt();
+  superexpr(BOOLEAN); 
 }
 
 /* mypas -> expr { cmdsep expr } <eof> */
 void mypas_old(void)
 {
-  expr();
+  expr(DEC);
   /*[[*/printf("%g\n", acc)/*]]*/;
 
   while ( iscmdsep() ) {
     if(lookahead!=-1) {
-      expr();
+      expr(DEC);
       /*[[*/printf("%g\n", acc)/*]]*/;
     }
   }
@@ -418,7 +383,8 @@ void mypas_old(void)
  *  REAL          |    REAL     |     REAL    |   DOUBLE
  *  DOUBLE        |   DOUBLE    |    DOUBLE   |   DOUBLE
  *
- *
+ * iscompatible...
+ * 
  *  _LVALUE_  || BOOLEAN | INTEGER |   REAL  |   DOUBLE
  * =======================================================
  *  BOOLEAN   |  BOOLEAN |   N/A   |   N/A   |    N/A
@@ -428,9 +394,90 @@ void mypas_old(void)
  *
  *  TUDO ISSO TEM Q VIRAR IF DENTRO DA EXPRESSAO
  */
+
+int iscompatible(int ltype, int rtype)
+{
+  switch(ltype) {
+    
+    case BOOLEAN:
+    case INTEGER:
+      if(rtype == ltype)
+	return ltype;
+      break;
+      
+    case REAL:
+      switch(rtype) {
+	case INTEGER:
+	case REAL:
+	  return ltype;
+      }
+      break;
+      
+    case DOUBLE:
+      switch(rtype) {
+	case INTEGER:
+	case REAL:
+	case DOUBLE:
+	  return ltype;
+      }
+  }
+  return 0;
+}
+
+int isrelop(void)
+{
+  switch(lookahead) {
+    case '>':
+      match('>');
+      if(lookahead == '=') {
+	match('=');
+	return GEQ; //greater or equal
+      }
+      return '>';
+      
+    case '<': 
+      match('<');
+      if(lookahead == '>') {
+	match('>');
+	return NEQ; //not equal
+      }
+      if(lookahead == '=') {
+	match('=');
+	return LEQ; //less or equal
+      }
+      return '<';
+      
+    case '=':
+      match('=');
+      return '=';
+  }
+  return 0;
+}
+
+/* syntax: superexpr -> expr [ relop expr ] */
+int superexpr(int inherited_type)
+{
+  int t1, t2;
+  t1 = expr(inherited_type); //t1 é para o lado esquerdo da expr
+  if(isrelop()) { //so passo para t2 se vier relop
+    t2 = expr(t1);
+    //TODO: VERIFICAR COMPATIBILIDADE de t1 com t2!
+    if(iscompatible(t1,t2)) {
+       fprintf(stderr, "incompatible operation %d with %d: fatal error.\n",t1,t2);
+    }
+  }
+  return min(BOOLEAN, t2);
+}
+
 int expr(int inherited_type)
 {
-  /*[[*/int varlocality, lvalue = 0, acctype = inherited_type/*]]*/;
+  /*[[*/int 
+	  varlocality,
+	  lvalue_seen = 0,
+	  acctype = inherited_type,
+	  syntype,
+	  ltype,
+	  rtype/*]]*/;
 
   if(lookahead == '-'){
     match('-');
@@ -461,20 +508,42 @@ int expr(int inherited_type)
         if(varlocality < 0) {
           fprintf(stderr, "parser: %s not declared... fatal error!\n",
             lexeme);
-        }
+	  syntype = -1;
+        } else {
+	  syntype = symtab[varlocality][1];
+	}
         /*]]*/
         match(ID);
         if (lookahead == ASGN) {
           /* located variable is LVALUE */
-          /*]]*/ lvalue = 1 /*]]*/;
+          /*[[*/ 
+	  lvalue_seen = 1;
+	  ltype = syntype;
+	  /*]]*/
           match(ASGN);
-          expr();
-        }
+	  /*[[*/
+          rtype =
+	  /*]]*/
+	  superexpr(/*[[*/ltype/*]]*/);
+	  
+	  /*[[*/
+	  if(iscompatible(ltype, rtype)) {
+	    acctype = max(rtype,acctype);
+	  } else {
+	    acctype = -1;
+	  } 
+	  /*]]*/
+	}
         /*[[*/
         else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
         }
+        
+        /*else {
+	  syntype = symtab[varlocality][1];
+	}*/
+	
         /*]]*/
         break;
 
@@ -488,7 +557,17 @@ int expr(int inherited_type)
 
       default:
         match('(');
-        expr();
+	/*[[*/syntype = /*]]*/
+        superexpr(0); 
+	//superexpr --> pode ter um operador relacional
+	//expr --> nao pode ter operador relacional a não ser que dentro de parentesis
+	/*[[*/
+	if(iscompatible(syntype, acctype)) {
+	  acctype = max(acctype,syntype);
+	} else {
+	  fprintf(stderr, "incompatible unary operator: fatal error.\n");
+	}
+	/*]]*/
         match(')');
     }
 
@@ -498,7 +577,7 @@ int expr(int inherited_type)
       goto T_entry;
     /* expression ends down here */
     /*[[*/
-    if(lvalue && varlocality > -1) {
+    if(lvalue_seen && varlocality > -1) {
       fprintf(object, "\tmovl %%eax,%s\n",symtab_stream + symtab[varlocality][0]);
     }
     /*]]*/
@@ -538,7 +617,7 @@ void fact (void)
     variable(); break;
 
     case '(':
-    match('('); expr(); match(')');break;
+    match('('); expr(DEC); match(')');break;
 
     case '>':
     match('>'); arith(); match(')');break;
@@ -663,7 +742,7 @@ void variable (void)
   match(ID);
   if (lookahead == ASGN) {// L-VALUE:
     match(ASGN); // ASGN = ':='
-    expr();
+    expr(DEC);
     /*[[*/store(varname)/*]]*/;
   } else { // R-VALUE:
     /*[[*/recall(varname)/*]]*/;

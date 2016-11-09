@@ -1,24 +1,35 @@
 #include <keywords.h>
 #include <string.h>
 
-char *keywords[] = {"begin","if","then","else","while","for","do","to",
-"downto","repeat","until","var","procedure","function","integer","real",
-"boolean","div","mod","and", "or","not", "end"};
-
+char *keywords[] = {
+  "begin",
+  "if",
+  "then",
+  "else",
+  "while",
+  "do",
+  "repeat",
+  "until",
+  "var",
+  "boolean",
+  "integer",
+  "real",
+  "double",
+  "div",
+  "mod",
+  "and",
+  "or",
+  "not",
+  "true",
+  "false",
+  "end"};
 
 int iskeyword(const char *identifier)
 {
-  // int token;
-  printf("%d", sizeof(keywords)/sizeof(*keywords));
-  int token = BEGIN;
-  while(token<=END) {
-      if(strcmp(keywords[END-token],identifier) == 0)
-        return token;
-      token++;
+  int token;
+  for(token = BEGIN;token < END+1;token++) {
+    if(strcmp(keywords[token-BEGIN],identifier) == 0)
+      return token;
   }
-  // for(token = BEGIN;token <= END;token++) {
-  //   if(strcmp(keywords[END-token],identifier) == 0)
-  //     return token;
-  // }
   return 0;
 }
