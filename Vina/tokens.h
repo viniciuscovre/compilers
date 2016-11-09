@@ -2,11 +2,17 @@
 
 enum {
 	ID = 1025,
-	DEC,
+	DEC,//apaga
 	OCTAL,
 	HEX,
-	FLOAT,
-	ASGN
+	FLOAT,//apaga
+	//INTCONST
+	//FLTCONST
+	////DBLCONST //double
+	ASGN,
+	GEQ,
+	LEQ,
+	NEQ,
 };
 
 enum {

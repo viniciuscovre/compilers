@@ -37,6 +37,7 @@
 
 /* expr -> term rest */
 int expr(int inherited_type);
+int superexpr(int inherited_type);
 /* term -> fact quoc */
 void term (void);
 /* rest -> addop term rest | <> */
@@ -71,7 +72,6 @@ void beginblock(void);
 void ifstmt(void);
 void whilestmt(void);
 void repeatstmt(void);
-void forstmt(void);
 int octalToInt(char octalToConvert[]);
 int hexToInt(char hexToConvert[]);
 

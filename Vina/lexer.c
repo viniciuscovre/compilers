@@ -17,8 +17,7 @@ void skipspaces (FILE *tape)
 {
   int cake;
 
-  while ( isspace ( cake = getc (tape) ) && cake != '\n' );
-  // while ( isblank ( cake = getc (tape) ) );
+  while ( isspace ( cake = getc (tape) ) && cake != (' ' | '\n' | '\t') );
   ungetc ( cake, tape );
 }
 
@@ -51,7 +50,6 @@ int is_identifier(FILE *tape)
     lexeme[token] = 0;
 
     token = iskeyword(lexeme);
-    printf("teste" );
     if(token)
       return token;
 
