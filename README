@@ -1,8 +1,6 @@
 TO DO
 - FLOAT operations - juntar com versão com IFs
 - verificação is_available para ver se tem posição disponível na symtab
-- Reconhecer mais constantes (não apenas a primeia cte digitada) quando usado o comando ENTER (nao ';')
-- colocar no vmachine "<" ">"
 - Operadores: Diferente, igual, maior, menor, and, or, not...etc
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
 // em keywords.[ch]
@@ -11,6 +9,7 @@ TO DO
 - toda consulta verificar existencia do simbolo
 - nao pode ter exit dentro do parser.c
 - criar flag para "fatal error" (verificar em mts lugares)
+- colocar erros em um arquivo separado e exibir ao fim da compilação
 
 DONE
 - colocar as labels(T_EXPR, T_TERM,....) - DONE - vina
