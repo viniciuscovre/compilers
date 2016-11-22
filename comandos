@@ -1,5 +1,10 @@
 var x, y : integer;
 begin
+
+  while y < -1 do
+    x := y;
+    x := x + 45;
+
   if x > 3 then
     begin
       x := 2 * y + 4;
@@ -7,4 +12,6 @@ begin
     end
   else
     y := 5;
+    x := 4;
+
 end.
