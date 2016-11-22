@@ -72,9 +72,9 @@ int iscmdsep(void)
 *
 * prgbody -> declarative imperative
 *
+**************************************************************************
 *
-* declarative ->[ VAR namelist : vartype ; { namelist : vartype } ]
-* 		{ sbpmod sbpname parmdef  [ : fnctype ]; body }
+* declarative ->[ vardef ] { sbpmod sbpname parmdef  [ : fnctype ]; body }
 *
 * sbmod -> PROCEDURE | FUNCTION
 *
@@ -82,8 +82,16 @@ int iscmdsep(void)
 *
 * namelist -> ID { , ID }
 *
+* vartype -> INTEGER | REAL | BOOLEAN
+*
+* fnctype -> INTEGER | REAL | BOOLEAN
+*
 * parmdef -> [( [VAR] namelist ':' { ';' [VAR] namelist ':' vartype }) ]
 *
+* vardef -> VAR namelist ':' vartype ';' { namelist ':' vartype ';'}
+*           || vardef.symtab <- forall symbol in namelist.name do
+*						     symtab_append(symbol,vartype.type)
+*						   end do
 *
 * imperative BEGIN stmtlist END
 *
@@ -94,42 +102,28 @@ void mypas(void)
 {
   body();
   match('.');
-  // match(EOF); // VERIFY IF REALLY NECESSARY ~vina
 }
 
-//prgbody -> declarative imperative
+// prgbody -> declarative imperative
 void body(void)
 {
-  declarative(); // simbolos serao declarados aqui
-  imperative(); // simbolos serao usados aqui
+  declarative(); // symbols will be declared here
+  imperative(); // symbols will be used here
 }
 
-/*declarative ->
-* 		[
-* 		  VAR namelist : vartype ;   ||
-* 		  { namelist : vartype ;}
-* 		]
-* 		{ sbpmod sbpname parmdef  [ : fnctype ]; body }
-
-*/
+// declarative ->[ vardef ] { sbpmod sbpname parmdef  [ : fnctype ]; body }
 void declarative(void)
 {
-  /*
-  * vardef -> VAR namelist ':' vartype ';' || vardef.symtab <-
-  * 						forall symbol in namelist.name do
-  *							symtab_append(symbol,vartype.type)
-  *						end do
-  *
-  *
-  */
-
-  if(lookahead == VAR) {
+  if (lookahead == VAR) {
     match(VAR);
     do {
       /*[[*/ int type , i /*]]*/;
+      // get the names of the declared variables
       /*[[*/ char **namev = /*]]*/ namelist();
       match(':');
+      // get the type of the declared variables
       /*[[*/ type =  /*]]*/ vartype();
+      // insert name values and types of the variables in the symtab
       /*[[*/ for(i=0; namev[i]; i++) symtab_append(namev[i], type); /*]]*/
       match(';');
     } while(lookahead == ID);
@@ -137,6 +131,8 @@ void declarative(void)
   }
 
 /*
+// NOT IMPLEMENTED FOR THE FINAL PROJECT...
+// PROJECT IS A *REDUCED* VERSION OF THE PASCAL COMPILER
   while(lookahead == PROCEDURE || lookahead == FUNCTION) {
     match(lookahead);
     match(ID);
@@ -152,6 +148,7 @@ void declarative(void)
 */
 }
 
+// fnctype -> INTEGER | REAL | BOOLEAN
 void fnctype(void)
 {
   switch(lookahead) {
@@ -169,7 +166,7 @@ void fnctype(void)
 
 }
 
-// * parmdef -> [( [VAR] namelist ':' { ';' [VAR] namelist ':' vartype }) ]
+// parmdef -> [ '(' [VAR] namelist ':' { ';' [VAR] namelist ':' vartype } ')' ]
 void parmdef(void)
 {
   if(lookahead == '(') {
@@ -192,6 +189,7 @@ void parmdef(void)
   match(')');
 }
 
+// vartype -> INTEGER | REAL | BOOLEAN
 int vartype(void)
 {
   switch(lookahead) {
@@ -218,12 +216,14 @@ void imperative(void)
 }
 
 //namelist -> ID { , ID }
+// array of symbols (symbolvec) with names of variables (IDs)
 char **namelist(void)
 {
-  /*[[*/ char **symbolvec = (char **)calloc(MAX_ARG_NUM, sizeof(char **));
-  int i = 0;/*]]*/
+  /*[[*/ char **symbolvec = (char **)calloc(MAX_ARG_NUM, sizeof(char **)); /*]]*/
+  /*[[*/ int i = 0; /*]]*/
+
   _namelist_begin:
-  /*[[*/ strcpy(symbolvec[i] = malloc(sizeof lexeme +1), lexeme); i++;/*]]*/
+  /*[[*/ strcpy(symbolvec[i] = malloc(sizeof lexeme +1), lexeme); i++; /*]]*/
   match(ID);
   while(lookahead == ',') {
     match(',');
@@ -270,12 +270,12 @@ void stmt(void)
       break;
 
     /*hereafter we expect FIRST(expr):*/
-    case ID: //tokens
-    case FLOAT: //tokens
-    case INTEGER: //tokens // mudar de dec para integer ou INTCONST
-    case TRUE: //keywords
-    case FALSE: //keywords
-    case NOT: //keywords
+    case ID: //tokens.h
+    case FLTCONST: //tokens.h
+    case INTCONST: //tokens.h
+    case TRUE: //keywords.h
+    case FALSE: //keywords.h
+    case NOT: //keywords.h
     case '-':
     case '(':
       expr(0);
@@ -347,12 +347,12 @@ void repeatstmt(void)
 /* mypas -> expr { cmdsep expr } <eof> */
 void mypas_old(void)
 {
-  expr(DEC);
+  expr(INTCONST);
   /*[[*/printf("%g\n", acc)/*]]*/;
 
   while ( iscmdsep() ) {
     if(lookahead!=-1) {
-      expr(DEC);
+      expr(INTCONST);
       /*[[*/printf("%g\n", acc)/*]]*/;
     }
   }
@@ -547,12 +547,12 @@ int expr(int inherited_type)
         /*]]*/
         break;
 
-      case FLOAT:
-        match(FLOAT);
+      case FLTCONST:
+        match(FLTCONST);
         break;
 
-      case DEC:
-        match(DEC);
+      case INTCONST:
+        match(INTCONST);
         break;
 
       default:
@@ -618,7 +618,7 @@ void fact (void)
     variable(); break;
 
     case '(':
-    match('('); expr(DEC); match(')');break;
+    match('('); expr(INTCONST); match(')');break;
 
     case '>':
     match('>'); arith(); match(')');break;
@@ -706,9 +706,9 @@ void constant (void)
     // // /*[[*/printf("decimal: ")/*]]*/;
     // break;
 
-    case FLOAT:
+    case FLTCONST:
       /*[[*/cp2acc(atof(lexeme))/*]]*/;
-      match(FLOAT);
+      match(FLTCONST);
       // /*[[*/printf("float: ")/*]]*/;
       break;
 
@@ -743,7 +743,7 @@ void variable (void)
   match(ID);
   if (lookahead == ASGN) {// L-VALUE:
     match(ASGN); // ASGN = ':='
-    expr(DEC);
+    expr(INTCONST);
     /*[[*/store(varname)/*]]*/;
   } else { // R-VALUE:
     /*[[*/recall(varname)/*]]*/;
