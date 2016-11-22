@@ -165,7 +165,24 @@ int is_float(FILE *tape) {
       ungetc(lexeme[i], tape);
       lexeme[i] = 0;
       return FLTCONST;
-    } //else if ()  //verificar se é EXP
+    } else if (tolower(lexeme[i]) == 'e') {
+      lexeme[++i] = getc(tape);
+
+      if (isdigit(lexeme[i]) || lexeme[i] == '+' || lexeme[i] == '-') {
+        lexeme[++i] = getc(tape);
+        if (isdigit(lexeme[i])) {
+          for(i++; isdigit(lexeme[i] = getc(tape)); i++);
+          ungetc(lexeme[i], tape);
+          lexeme[i] = 0;
+          return FLTCONST;
+        }
+      }
+
+      ungetc(lexeme[i], tape);
+      lexeme[i] = 0;
+
+      return 0;
+    }
 
     ungetc(lexeme[i], tape);
     lexeme[i] = 0;
