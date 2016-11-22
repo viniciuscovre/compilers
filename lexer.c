@@ -67,12 +67,12 @@ int is_decimal(FILE *tape)
     if (lexeme[i] == '0') {
       if( (lexeme[++i] = getc(tape)) == '0' || lexeme[i] == EOF || lexeme[i] == EOL ) {
         // ungetc (lexeme[i], tape);
-        return DEC;
+        return INTCONST;
       } else if (lexeme[i] == '.' || tolower(lexeme[i]) == 'e') {
         //for later float verification ~vina
         ungetc (lexeme[i], tape);
         lexeme[i] = 0;
-        return DEC;
+        return INTCONST;
       } else {
         ungetc (lexeme[i], tape);
         ungetc (lexeme[i-1], tape);
@@ -89,7 +89,7 @@ int is_decimal(FILE *tape)
     // }
     ungetc (lexeme[i], tape);
     lexeme[i] = 0;
-    return DEC;
+    return INTCONST;
   }
   ungetc (lexeme[i], tape);
   return 0;
@@ -164,12 +164,12 @@ int is_float(FILE *tape) {
       for(i++; isdigit(lexeme[i] = getc(tape)); i++);
       ungetc(lexeme[i], tape);
       lexeme[i] = 0;
-      return FLOAT;
+      return FLTCONST;
     } //else if ()  //verificar se é EXP
 
     ungetc(lexeme[i], tape);
     lexeme[i] = 0;
-    return DEC;
+    return INTCONST;
   }
 
   lexeme[0] = getc(tape);
@@ -180,7 +180,7 @@ int is_float(FILE *tape) {
       for(i++; isdigit(lexeme[i] = getc(tape)); i++);
       ungetc(lexeme[i], tape);
       lexeme[i] = 0;
-      return FLOAT;
+      return FLTCONST;
     }
     ungetc(lexeme[1], tape);
   }
@@ -188,6 +188,7 @@ int is_float(FILE *tape) {
   return 0;
 }
 
+// gettoken verifies token by token of the given input
 int gettoken (FILE *tokenstream)
 {
   int token;
