@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <lexer.h>
 /********************************** Recursive LL(1) Pareser *****************************************
  *
  * Method: assign nonterminal symbols to C-function names
@@ -34,6 +35,9 @@
  *
  * constant -> DEC | OCT | HEX | FLT
  */
+
+ #define MAXSYMTAB_ENTRIES 0x10000
+ #define MAXSTACK_SIZE     0x40
 
 /* expr -> term rest */
 int expr(int inherited_type);

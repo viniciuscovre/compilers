@@ -43,13 +43,14 @@
 #include <tokens.h>
 #include <parser.h>
 #include <lexer.h>
-#include <vmachine.h>
 #include <keywords.h>
 #include <symtab.h>
 #include <mypas.h>
 #include <macros.h>
+#include <pseudoassembly.h>
 
 #define MAX_ARG_NUM 1024
+#define MAXID_SIZE 64
 
 char **namelist(void);
 
@@ -189,6 +190,24 @@ void parmdef(void)
   match(')');
 }
 
+//namelist -> ID { , ID }
+// array of symbols (symbolvec) with names of variables (IDs)
+char **namelist(void)
+{
+  /*[[*/ char **symbolvec = (char **)calloc(MAX_ARG_NUM, sizeof(char **)); /*]]*/
+  /*[[*/ int i = 0; /*]]*/
+
+  _namelist_begin:
+  /*[[*/ strcpy(symbolvec[i] = malloc(sizeof lexeme +1), lexeme); i++; /*]]*/
+  match(ID);
+  while(lookahead == ',') {
+    match(',');
+    goto _namelist_begin;
+  }
+
+  /*[[*/ return symbolvec /*]]*/;
+}
+
 // vartype -> INTEGER | REAL | BOOLEAN
 int vartype(void)
 {
@@ -213,24 +232,6 @@ void imperative(void)
   match(BEGIN);
   stmtlist();
   match(END);
-}
-
-//namelist -> ID { , ID }
-// array of symbols (symbolvec) with names of variables (IDs)
-char **namelist(void)
-{
-  /*[[*/ char **symbolvec = (char **)calloc(MAX_ARG_NUM, sizeof(char **)); /*]]*/
-  /*[[*/ int i = 0; /*]]*/
-
-  _namelist_begin:
-  /*[[*/ strcpy(symbolvec[i] = malloc(sizeof lexeme +1), lexeme); i++; /*]]*/
-  match(ID);
-  while(lookahead == ',') {
-    match(',');
-    goto _namelist_begin;
-  }
-
-  /*[[*/ return symbolvec /*]]*/;
 }
 
 //stmtlist -> stmt { ';' stmt }
@@ -299,36 +300,51 @@ void beginblock(void)
   match(END);
 }
 
+//TODO: gofalse
 //ifstmt -> IF superexpr THEN stmt [ ELSE stmt ] | other
-int labelcounter = 1;
 void ifstmt(void)
 {
-  int _endif, _else;
-  int syntype;
+  /*[[*/int _endif, _else;/*]]*/
+  // int syntype;
   match(IF);
-  syntype = superexpr(BOOLEAN); //-> <superexpr>asm
+  superexpr(BOOLEAN);
+  // syntype = superexpr(BOOLEAN); //-> <superexpr>asm
+  /**//**/
   fprintf(object, "\tjz .L%d\n", _endif = _else = labelcounter++);
   //TODO: verif se o tipo sintetizado é compatível com o tipo herdado
   match(THEN);
   stmt();
   if(lookahead == ELSE) {
     match(ELSE);
-    _endif = labelcounter++;
-    fprintf(object, "\tjmp .L%d\n", _endif);
-    fprintf(object, ".L%d\n", _else);
+    _endif = jump(labelcounter++); //[before] --> _endif = labelcounter++;
+    mklabel(_else);
+    mklabel(_endif);
     stmt();
   }
-  fprintf(object, ".L%d\n", _endif);
+  mklabel(_endif);
 
 }
 
 //whilestmt -> WHILE expr DO stmt
 void whilestmt(void)
 {
+  /*[[*/int while_head, while_tail/*]]*/;
+
   match(WHILE);
+
+  /*[[*/mklabel(while_head = labelcounter++)/*]]*/;
+
   superexpr(BOOLEAN);
+
+  /*[[*/gofalse(while_tail = labelcounter++)/*]]*/;
+
   match(DO);
   stmt();
+
+  /*[[*/jump(while_head)/*]]*/;
+
+  /*[[*/mklabel(while_tail)/*]]*/;
+
 }
 
 //repeatstmt -> REPEAT stmt { ; stmt } UNTIL expr
@@ -342,22 +358,6 @@ void repeatstmt(void)
   }
   match(UNTIL);
   superexpr(BOOLEAN);
-}
-
-/* mypas -> expr { cmdsep expr } <eof> */
-void mypas_old(void)
-{
-  expr(INTCONST);
-  /*[[*/printf("%g\n", acc)/*]]*/;
-
-  while ( iscmdsep() ) {
-    if(lookahead!=-1) {
-      expr(INTCONST);
-      /*[[*/printf("%g\n", acc)/*]]*/;
-    }
-  }
-
-  match(EOF);
 }
 
 /* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
@@ -430,20 +430,20 @@ int isrelop(void)
     case '>':
       match('>');
       if(lookahead == '=') {
-	match('=');
-	return GEQ; //greater or equal
+	       match('=');
+         return GEQ; //greater or equal
       }
       return '>';
 
     case '<':
       match('<');
       if(lookahead == '>') {
-	match('>');
-	return NEQ; //not equal
+	       match('>');
+         return NEQ; //not equal
       }
       if(lookahead == '=') {
-	match('=');
-	return LEQ; //less or equal
+	       match('=');
+         return LEQ; //less or equal
       }
       return '<';
 
@@ -472,26 +472,26 @@ int superexpr(int inherited_type)
 int expr(int inherited_type)
 {
   /*[[*/int
-	  varlocality,
-	  lvalue_seen = 0,
-	  acctype = inherited_type,
-	  syntype,
-	  ltype,
-	  rtype/*]]*/;
+	varlocality,             // position of a variable in symtab
+	lvalue_seen = 0,         // flag is 1 when see LVALUE [before]
+	acctype = inherited_type,// accumulated type [after]
+	syntype,                 // symbol type declared in symtab [before]
+	ltype,           // syntype but for later compatibility verification [before]
+	rtype/*]]*/;     // updated type (with or without promotion) [after]
 
   if(lookahead == '-'){
     match('-');
     /*[[*/
-    if(acctype == BOOLEAN) {
+    if(acctype == BOOLEAN) { // "minus" isn't compatible with boolean operation
       fprintf(stderr, "incompatible unary operator: fatal error.\n");
     } else if (acctype == 0) {
       acctype = INTEGER;
     }
     /*]]*/
-  } else if (lookahead == NOT){
+  } else if (lookahead == NOT) {
     match(NOT);
     /*[[*/
-    if(acctype > BOOLEAN) {
+    if(acctype > BOOLEAN) { // "not" isn't compatible with non-boolean operation
       fprintf(stderr, "incompatible unary operator: fatal error.\n");
     }
     acctype = BOOLEAN;
@@ -506,48 +506,46 @@ int expr(int inherited_type)
         /*[[*/
         varlocality = symtab_lookup(lexeme);
         if(varlocality < 0) {
-          fprintf(stderr, "parser: %s not declared... fatal error!\n",
-            lexeme);
-	  syntype = -1;
+          fprintf(stderr, "parser: %s not declared... fatal error!\n", lexeme);
+	        syntype = -1;
         } else {
-	  syntype = symtab[varlocality][1];
-	}
+	        syntype = symtab[varlocality][1];
+	      }
         /*]]*/
         match(ID);
         if (lookahead == ASGN) {
           /* located variable is LVALUE */
           /*[[*/
-	  lvalue_seen = 1;
-	  ltype = syntype;
-	  /*]]*/
+	        lvalue_seen = 1;
+	        ltype = syntype;
+	        /*]]*/
           match(ASGN);
-	  /*[[*/
-          rtype =
-	  /*]]*/
-	  superexpr(/*[[*/ltype/*]]*/);
+          //verify if rtype changes symbol type...
+	        /*[[*/ rtype = /*]]*/ superexpr(/*[[*/ltype/*]]*/);
 
-	  /*[[*/
-	  if(iscompatible(ltype, rtype)) {
-	    acctype = max(rtype,acctype);
-	  } else {
-	    acctype = -1;
-	  }
-	  /*]]*/
-	}
-        /*[[*/
-        else if(varlocality > -1) {
+      	  /*[[*/
+      	  if(iscompatible(ltype, rtype)) {
+      	    acctype = max(rtype,acctype);
+      	  } else {
+      	    acctype = -1;
+      	  }
+      	  /*]]*/
+	      } /*[[*/ else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
-        }
-
-        /*else {
-	  syntype = symtab[varlocality][1];
-	}*/
-
+        } /*else {
+	        syntype = symtab[varlocality][1];
+	      }*/
         /*]]*/
         break;
 
       case FLTCONST:
+        {
+          float lexval = atof(lexeme);
+          char *fltIEEE = malloc(sizeof(lexeme) + 1);
+          spritnf(fltIEEE, "$%i", *((int *)&lexval) );
+          rmovel(fltIEEE);
+        }
         match(FLTCONST);
         break;
 
@@ -576,24 +574,28 @@ int expr(int inherited_type)
     if(addop())
       goto T_entry;
     /* expression ends down here */
+
     /*[[*/
     if(lvalue_seen && varlocality > -1) {
-      fprintf(object, "\tmovl %%eax,%s\n",symtab_stream + symtab[varlocality][0]);
+      switch(ltype) {
+        //verifica com que tipo de instruções vai trabalhar
+        //se de 32 bits ou 64 bits
+        case INTEGER: case REAL: case BOOLEAN:
+          lmovel(symtab_stream + symtab[varlocality][0]);
+          break;
+
+        case DOUBLE:
+          lmoveq(symtab_stream + symtab[varlocality][0]);
+          break;
+
+        default: //case  BOOLEAN
+        //TODO: decide what to do with BOOLEAN
+          break;
+      }
     }
     /*]]*/
     return 0;
 }
-
-/* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
-// void expr (void)
-// {/*[[*/int opsymbol;/*]]*/
-//   term();
-//   while((opsymbol=addop())) {
-//     /*[[*/accpush()/*]]*/;
-//     term();
-//     /*[[*/operationlib(opsymbol)/*]]*/;
-//   }
-// }
 
 /* term -> fact { mulop fact [[ print mulop.pf ]] } */
 void term (void)

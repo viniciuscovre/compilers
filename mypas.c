@@ -4,7 +4,6 @@
 #include <lexer.h>
 #include <string.h>
 #include <mypas.h>
-#include <vmachine.h>
 #define MAX_NUM_DE_COMANDOS 64 //para leitura_comandos
 #define TAMANHO_MAX_DE_CADA_COMANDO 256 //para leitura_comandos
 

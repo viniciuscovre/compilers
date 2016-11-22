@@ -1,4 +1,5 @@
 /**@<mypas.h>::**/
+#include <stdio.h>
 
 extern int gettoken(FILE *);
 
