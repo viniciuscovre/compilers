@@ -2,13 +2,11 @@
 
 enum {
 	ID = 1025,
-	DEC,//apaga
+	INTCONST,
 	OCTAL,
 	HEX,
-	FLOAT,//apaga
-	//INTCONST
-	//FLTCONST
-	////DBLCONST //double
+	FLTCONST,
+	DBLCONST,
 	ASGN,
 	GEQ,
 	LEQ,

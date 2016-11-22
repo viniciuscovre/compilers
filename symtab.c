@@ -16,8 +16,8 @@ int symtab_lookup(char const *name)
 {
 
   int i;
-  for(i=symtab_nextentry-1;i>-1;i--){
-   if( strcmp(symtab_stream + symtab[i][0],name)==0){
+  for(i = symtab_nextentry - 1; i > -1; i--){
+   if( strcmp(symtab_stream + symtab[i][0],name) == 0){
     break;
    }
   }
@@ -28,7 +28,7 @@ int symtab_append(char const *name, int type)
 {
   int location = symtab_lookup(name);
 
-  if(symtab_nextentry == MAX_SYMTAB_ENTRIES) 
+  if(symtab_nextentry == MAX_SYMTAB_ENTRIES)
     return -2; //symtab cheio
   if(location > -1 )
     return -3; // 'name' existe dentro do symtab
