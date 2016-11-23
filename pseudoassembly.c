@@ -39,12 +39,14 @@ int lmoveq (char const *variable) // copy of 64 bits
 
 int rmovel (char const *variable) // copy of 32 bits
 {
+  fprintf(object, "\tpushl %%eax\n");
   fprintf(object, "\tmovl %s, %%eax\n",variable);
   return 0;
 }
 
 int rmoveq (char const *variable) // copy of 64 bits
 {
+  fprintf(object, "\tpushl %%rax\n");
   fprintf(object, "\tmovq %s, %%rax\n",variable);
   return 0;
 }
@@ -122,7 +124,7 @@ int adddbl(void)
   fprintf(object, "\taddsd %%xmm1, xmm0\n");
   fprintf(object, "\tmovsd %%xmm0, %%rax\n");
   fprintf(object, "\taddq $8, %%rsp\n");
-
+  return 0;
 }
 
 int subint(void)

@@ -50,7 +50,6 @@
 #include <pseudoassembly.h>
 
 #define MAX_ARG_NUM 1024
-#define MAXID_SIZE 64
 
 char **namelist(void);
 
@@ -543,7 +542,7 @@ int expr(int inherited_type)
         {
           float lexval = atof(lexeme);
           char *fltIEEE = malloc(sizeof(lexeme) + 1);
-          spritnf(fltIEEE, "$%i", *((int *)&lexval) );
+          sprintf(fltIEEE, "$%i", *((int *)&lexval) );
           rmovel(fltIEEE);
         }
         match(FLTCONST);
@@ -595,50 +594,6 @@ int expr(int inherited_type)
     }
     /*]]*/
     return 0;
-}
-
-/* term -> fact { mulop fact [[ print mulop.pf ]] } */
-void term (void)
-{/*[[*/int opsymbol/*]]*/;
-  fact();
-  while((opsymbol=mulop())) {
-    /*[[*/accpush()/*]]*/;
-    fact();
-    /*[[*/operationlib(opsymbol)/*]]*/;
-  }
-}
-
-/* fact -> variable | constant | ( expr )
-
-variable -> ID
-constant -> DEC */
-void fact (void)
-{
-  switch (lookahead) {
-
-    case ID:
-    variable(); break;
-
-    case '(':
-    match('('); expr(INTCONST); match(')');break;
-
-    case '>':
-    match('>'); arith(); match(')');break;
-
-    default:
-    constant();
-  }
-}
-
-/* arith ->  NUMERO arithmetic_op NUMERO , no caso numero sera DEC inicialmente, deve evoluir pra todos os tipos*/
-void arith (void)
-{/*[[*/int opsymbol/*]]*/;
-  fact();
-  while((opsymbol=arithmetic_op())) {
-    /*[[*/accpush()/*]]*/;
-    fact();
-    /*[[*/operationlib(opsymbol)/*]]*/;
-  }
 }
 
 /* addop -> + | - | OR */
@@ -693,44 +648,6 @@ int arithmetic_op (void)
   }
   return 0;
 }
-/* constant -> [[ print DEC ]] DEC
-*           | [[ print OCT ]] OCT
-*           | [[ print HEX ]] HEX
-*           | [[ print FLT ]] FLT */
-void constant (void)
-{
-  int value = -1; //starts with -1 to detect a possible further error
-  switch(lookahead) {
-
-    // case DEC:
-    // /*[[*/cp2acc(atof(lexeme))/*]]*/;
-    // match(DEC);
-    // // /*[[*/printf("decimal: ")/*]]*/;
-    // break;
-
-    case FLTCONST:
-      /*[[*/cp2acc(atof(lexeme))/*]]*/;
-      match(FLTCONST);
-      // /*[[*/printf("float: ")/*]]*/;
-      break;
-
-    case OCTAL:
-      value = octalToInt(lexeme);
-      /*[[*/cp2acc((float)value)/*]]*/;
-      match(OCTAL);
-      // /*[[*/printf("octal value in decimal: ")/*]]*/;
-      break;
-
-    case HEX:
-      value = hexToInt(lexeme);
-      /*[[*/cp2acc((float)value)/*]]*/;
-      match(HEX);
-      // /*[[*/printf("hexadecimal value in decimal: ")/*]]*/;
-      break;
-
-    /* VRIFY DEFAULT CASE ~vina */
-  }
-}
 
 /* variable -> [[ print ID ]] ID */
 void variable (void)
@@ -746,9 +663,9 @@ void variable (void)
   if (lookahead == ASGN) {// L-VALUE:
     match(ASGN); // ASGN = ':='
     expr(INTCONST);
-    /*[[*/store(varname)/*]]*/;
+    // /*[[*/store(varname)/*]]*/;
   } else { // R-VALUE:
-    /*[[*/recall(varname)/*]]*/;
+    // /*[[*/recall(varname)/*]]*/;
   }
 }
 

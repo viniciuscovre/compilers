@@ -62,7 +62,7 @@ void leitura_comandos()
 
   // insere os comandos escritos no arquivo "comandos"
   do {
-    fprintf(comandos,entrada[i]);
+    fprintf(comandos,"%s",entrada[i]);
     if((i+1)!=numero_de_comandos)
       fprintf(comandos,"\n");
     i++;
