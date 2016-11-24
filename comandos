@@ -18,6 +18,4 @@ begin
     y := 5;
     x := 4;
     end;
-    writeln('x=',x);
-    writeln('y=',y);
 end.
