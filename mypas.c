@@ -46,6 +46,8 @@ int main (int argc, char *argv[], char *envp[])
 
   exit (0);
 }
+
+//PARTE EXTRA PARA MODO REPL, INSERIDO NA FASE mybc
 void leitura_comandos()
 {
   FILE* comandos;
