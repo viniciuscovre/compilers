@@ -15,7 +15,7 @@ int gofalse(int label)
 
 int jump (int label)
 {
-  fprintf(object, "\tjz .L%d\n", label);
+  fprintf(object, "\tjmp .L%d\n", label);
   return label;
 }
 

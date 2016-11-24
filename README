@@ -1,25 +1,9 @@
 TO DO
-- verificação is_available para ver se tem posição disponível na symtab
-- Operadores: Diferente, igual, maior, menor, and, or, not...etc
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
 // em keywords.[ch]
-- Parser - na hora de declarar -> botar na tabela
-- toda consulta verificar existencia do simbolo
-- nao pode ter exit dentro do parser.c
-- criar flag para "fatal error" (verificar em mts lugares)
 - colocar erros em um arquivo separado e exibir ao fim da compilação
-
-DONE
-- FLOAT operations - juntar com versão com IFs - DONE - vina
-- colocar as labels(T_EXPR, T_TERM,....) - DONE - vina
-- adicionar codigo de IF ELSE WHILE - DONE - vina
-- colocar iskeyword na isidentifier - DONE - Yuji
-- implementar Float ~vina
-- implementar Hex, Oct FEITO ~vina
-- verificar \n no skipspace FEITO ~William
-- alterar o nome do projeto de mypas para progcalc ~FEITO ~William (Assumindo que a tarefa correta seja mudar o nome de progcalc para mypas)
-- cmdsep deve ter os casos de ";" e "/n" FEITO ~William
-- token mismatch quando acaba com ";" FEITO ~William
-- - na função gettoken - alterar "tokenstream" para "sourcecode" FEITO -William
+- preencher pseudoassembly.c
+- encaixar as chamadas de funcoes do pseudoassembly
+- organizar de acordo com o comentario do eraldo
 
 http://primepuzzle.com/tp2/syntax-diagrams.html
