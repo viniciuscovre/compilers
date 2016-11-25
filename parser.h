@@ -76,8 +76,9 @@ void beginblock(void);
 void ifstmt(void);
 void whilestmt(void);
 void repeatstmt(void);
-int octalToInt(char octalToConvert[]);
 int hexToInt(char hexToConvert[]);
+int octalToInt(char octalToConvert[]);
+
 
 /******************************* lexer-to-parser interface *****************************************/
 

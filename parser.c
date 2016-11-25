@@ -299,7 +299,6 @@ void beginblock(void)
   match(END);
 }
 
-//TODO: gofalse
 //ifstmt -> IF superexpr THEN stmt [ ELSE stmt ] | other
 void ifstmt(void)
 {
