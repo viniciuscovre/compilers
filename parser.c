@@ -130,15 +130,6 @@ void declarative(void)
       }
       /*]]*/
 
-      /*[[*/
-      for(i=0; namev[i]; i++){
-        if(symtab_append(namev[i], type)==-2)
-        printf(stderr,"FATAL ERROR: no more space in symtab");
-        else if (symtab_append(namev[i], type)==-3)
-        fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]);
-      }
-      /*]]*/
-
       match(';');
     } while(lookahead == ID);
 
