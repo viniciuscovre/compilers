@@ -1,38 +1,34 @@
-/********************** Recursive LL(1) Pareser **********************
-*
-* Method: assign nonterminal symbols to C-function names
-*
-* LL(1) grammars have not left recursion:
-*
-* productions like A =>* A alpha are not allowed.
-*
-* Left recursive grammars must be renormalized to Greibach normal form
-* or at least productions of kind A =>* B alpha, where B not equal to A.
-*
-* For example: E -> E + T | T could be written as
-*
-* E -> T R, R-> + T R | <>
-*
-* Thus, the calculator language becomes:
-*
-* expr -> term rest
-*
-* rest -> addop term rest | <>
-*
-* term -> fact quoc
-*
-* quoc -> mulop fact quoc | <>
-*
-* fact -> variable | constant | ( expr )
-*
-* addop -> + | -
-*
-* mulop -> * | /
-*
-* variable -> ID
-*
-* constant -> DEC | OCT | HEX | FLT
-*/
+/*********************** Recursive LL(1) Pareser ***********************/
+/*
+ * Method: assign nonterminal symbols to C-function names
+ *
+ * LL(1) grammars have not left recursion:
+ *
+ * productions like A =>* A alpha are not allowed.
+ *
+ * Left recursive grammars must be renormalized to Greibach normal form
+ * or at least productions of kind A =>* B alpha, where B not equal to A.
+ *
+ * For example: E -> E + T | T could be written as
+ *
+ * E -> T R, R-> + T R | <>
+ *
+ * Thus, the mypas language becomes (using EBNF notation):
+ *
+ * expr -> term { addop term }
+ *
+ * term -> fact { mulop fact }
+ *
+ * fact -> variable | constant | ( expr )
+ *
+ * addop -> + | -
+ *
+ * mulop -> * | /
+ *
+ * variable -> ID
+ *
+ * constant -> DEC | OCT | HEX | FLT
+ */
 
 /* system include */
 #include <stdio.h>
@@ -123,8 +119,8 @@ void declarative(void)
       match(':');
       // get the type of the declared variables
       /*[[*/ type =  /*]]*/ vartype();
+
       // insert name values and types of the variables in the symtab
-<<<<<<< HEAD
       /*[[*/
       for(i=0; namev[i]; i++) {
         if(symtab_append(namev[i], type)==-2)
@@ -133,15 +129,16 @@ void declarative(void)
         fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]);
       }
       /*]]*/
-=======
-      /*[[*/ for(i=0; namev[i]; i++)
-                {
-                  if(symtab_append(namev[i], type)==-2)
-                  printf(stderr,"FATAL ERROR: no more space in symtab");
-                  else if (symtab_append(namev[i], type)==-3)
-                  fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]); /*]]*/
-                }  
->>>>>>> e30b0261b977529b8811ad25351f08e34dc33541
+
+      /*[[*/
+      for(i=0; namev[i]; i++){
+        if(symtab_append(namev[i], type)==-2)
+        printf(stderr,"FATAL ERROR: no more space in symtab");
+        else if (symtab_append(namev[i], type)==-3)
+        fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]);
+      }
+      /*]]*/
+
       match(';');
     } while(lookahead == ID);
 

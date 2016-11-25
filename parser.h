@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <lexer.h>
-/********************************** Recursive LL(1) Pareser *****************************************
- *
+/*********************** Recursive LL(1) Pareser ***********************/
+/*
  * Method: assign nonterminal symbols to C-function names
  *
  * LL(1) grammars have not left recursion:
@@ -15,15 +15,11 @@
  *
  * E -> T R, R-> + T R | <>
  *
- * Thus, the calculator language becomes:
+ * Thus, the mypas language becomes (using EBNF notation):
  *
- * expr -> term rest
+ * expr -> term { addop term }
  *
- * rest -> addop term rest | <>
- *
- * term -> fact quoc
- *
- * quoc -> mulop fact quoc | <>
+ * term -> fact { mulop fact }
  *
  * fact -> variable | constant | ( expr )
  *
@@ -39,17 +35,12 @@
  #define MAXSYMTAB_ENTRIES 0x10000
  #define MAXSTACK_SIZE     0x40
 
-/* expr -> term rest */
-int expr(int inherited_type);
+/* expr -> term { addop term }
+ * term -> fact { mulop fact }
+ * fact -> variable | constant | ( expr )
+ */
+int expr(void);
 int superexpr(int inherited_type);
-/* term -> fact quoc */
-void term (void);
-/* rest -> addop term rest | <> */
-void rest (void);
-/* quoc -> mulop fact quoc | <> */
-void quoc(void);
-/* fact -> variable | constant | ( expr ) */
-void fact (void);
 /* addop -> + | - */
 int addop (void);
 /* mulop -> * | / */
@@ -79,8 +70,7 @@ void repeatstmt(void);
 int hexToInt(char hexToConvert[]);
 int octalToInt(char octalToConvert[]);
 
-
-/******************************* lexer-to-parser interface *****************************************/
+/*********************** lexer-to-parser interface ***********************/
 
 extern int lookahead; /** @ parser.c **/
 
