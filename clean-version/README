@@ -1,0 +1,4 @@
+Para testar o código (no terminal):
+
+$ make
+$ ./mypas comandos
