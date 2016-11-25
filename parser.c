@@ -124,6 +124,7 @@ void declarative(void)
       // get the type of the declared variables
       /*[[*/ type =  /*]]*/ vartype();
       // insert name values and types of the variables in the symtab
+<<<<<<< HEAD
       /*[[*/
       for(i=0; namev[i]; i++) {
         if(symtab_append(namev[i], type)==-2)
@@ -132,6 +133,15 @@ void declarative(void)
         fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]);
       }
       /*]]*/
+=======
+      /*[[*/ for(i=0; namev[i]; i++)
+                {
+                  if(symtab_append(namev[i], type)==-2)
+                  printf(stderr,"FATAL ERROR: no more space in symtab");
+                  else if (symtab_append(namev[i], type)==-3)
+                  fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]); /*]]*/
+                }  
+>>>>>>> e30b0261b977529b8811ad25351f08e34dc33541
       match(';');
     } while(lookahead == ID);
 
