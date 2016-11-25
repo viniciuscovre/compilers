@@ -1,6 +1,4 @@
 /**@<symtab.c>::**/
-
-
 #include <string.h>
 #include <symtab.h>
 #include <parser.h>

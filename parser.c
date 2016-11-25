@@ -124,7 +124,14 @@ void declarative(void)
       // get the type of the declared variables
       /*[[*/ type =  /*]]*/ vartype();
       // insert name values and types of the variables in the symtab
-      /*[[*/ for(i=0; namev[i]; i++) symtab_append(namev[i], type); /*]]*/
+      /*[[*/
+      for(i=0; namev[i]; i++) {
+        if(symtab_append(namev[i], type)==-2)
+        printf(stderr,"FATAL ERROR: no more space in symtab");
+        else if (symtab_append(namev[i], type)==-3)
+        fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]);
+      }
+      /*]]*/
       match(';');
     } while(lookahead == ID);
 
@@ -602,6 +609,7 @@ int addop (void)
   {
     case '+':
       match('+');
+      addint();
       return '+';
 
     case '-':
@@ -652,9 +660,13 @@ int arithmetic_op (void)
 void variable (void)
 {
   /* symbol must be declared */
+  /*[[*/
   if(symtab_lookup(lexeme) == -1) {
-    exit(-1);
+    fprintf(stderr,"FATAL ERROR: symbol not find #:%d",-1);
+    return;
+    //exit(-1);
   }
+  /*]]*/
 
   /*[[*/char varname[MAXID_SIZE]/*]]*/;
   /*[[*/strcpy(varname, lexeme)/*]]*/;
@@ -714,6 +726,8 @@ void match (int expected_token)
     fprintf (stderr, "\nparser: token mismatch error.\n");
     fprintf (stderr, "expecting %d but seen %d. Exting...\n",
     expected_token, lookahead);
-    exit (SYNTAX_ERR);
+    //exit (SYNTAX_ERR);
+    fprintf(stderr,"FATAL ERROR",SYNTAX_ERR);
+    return;
   }
 }
