@@ -1,34 +1,38 @@
-/*********************** Recursive LL(1) Pareser ***********************/
-/*
- * Method: assign nonterminal symbols to C-function names
- *
- * LL(1) grammars have not left recursion:
- *
- * productions like A =>* A alpha are not allowed.
- *
- * Left recursive grammars must be renormalized to Greibach normal form
- * or at least productions of kind A =>* B alpha, where B not equal to A.
- *
- * For example: E -> E + T | T could be written as
- *
- * E -> T R, R-> + T R | <>
- *
- * Thus, the mypas language becomes (using EBNF notation):
- *
- * expr -> term { addop term }
- *
- * term -> fact { mulop fact }
- *
- * fact -> variable | constant | ( expr )
- *
- * addop -> + | -
- *
- * mulop -> * | /
- *
- * variable -> ID
- *
- * constant -> DEC | OCT | HEX | FLT
- */
+/********************** Recursive LL(1) Pareser **********************
+*
+* Method: assign nonterminal symbols to C-function names
+*
+* LL(1) grammars have not left recursion:
+*
+* productions like A =>* A alpha are not allowed.
+*
+* Left recursive grammars must be renormalized to Greibach normal form
+* or at least productions of kind A =>* B alpha, where B not equal to A.
+*
+* For example: E -> E + T | T could be written as
+*
+* E -> T R, R-> + T R | <>
+*
+* Thus, the calculator language becomes:
+*
+* expr -> term rest
+*
+* rest -> addop term rest | <>
+*
+* term -> fact quoc
+*
+* quoc -> mulop fact quoc | <>
+*
+* fact -> variable | constant | ( expr )
+*
+* addop -> + | -
+*
+* mulop -> * | /
+*
+* variable -> ID
+*
+* constant -> DEC | OCT | HEX | FLT
+*/
 
 /* system include */
 #include <stdio.h>
@@ -119,17 +123,14 @@ void declarative(void)
       match(':');
       // get the type of the declared variables
       /*[[*/ type =  /*]]*/ vartype();
-
       // insert name values and types of the variables in the symtab
-      /*[[*/
-      for(i=0; namev[i]; i++) {
-        if(symtab_append(namev[i], type)==-2)
-        printf(stderr,"FATAL ERROR: no more space in symtab");
-        else if (symtab_append(namev[i], type)==-3)
-        fprintf(stderr,"FATAL ERROR: %s name does not exist in symtab",namev[i]);
-      }
-      /*]]*/
-
+      /*[[*/ for(i=0; namev[i]; i++)
+                {
+                  if(symtab_append(namev[i], type)==-2)
+                  fprintf(erro,"FATAL ERROR: -2 no more space in symtab");
+                  else if (symtab_append(namev[i], type)==-3)
+                  fprintf(erro,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]); /*]]*/
+                }
       match(';');
     } while(lookahead == ID);
 
@@ -466,7 +467,7 @@ int superexpr(int inherited_type)
     t2 = expr(t1);
     //TODO: VERIFICAR COMPATIBILIDADE de t1 com t2!
     if(iscompatible(t1,t2)) {
-       fprintf(stderr, "incompatible operation %d with %d: fatal error.\n",t1,t2);
+       fprintf(erro, "incompatible operation %d with %d: fatal error.\n",t1,t2);
     }
   }
   return min(BOOLEAN, t2);
@@ -486,7 +487,7 @@ int expr(int inherited_type)
     match('-');
     /*[[*/
     if(acctype == BOOLEAN) { // "minus" isn't compatible with boolean operation
-      fprintf(stderr, "incompatible unary operator: fatal error.\n");
+      fprintf(erro, "incompatible unary operator: fatal error.\n");
     } else if (acctype == 0) {
       acctype = INTEGER;
     }
@@ -495,7 +496,7 @@ int expr(int inherited_type)
     match(NOT);
     /*[[*/
     if(acctype > BOOLEAN) { // "not" isn't compatible with non-boolean operation
-      fprintf(stderr, "incompatible unary operator: fatal error.\n");
+      fprintf(erro, "incompatible unary operator: fatal error.\n");
     }
     acctype = BOOLEAN;
     /*]]*/
@@ -509,7 +510,7 @@ int expr(int inherited_type)
         /*[[*/
         varlocality = symtab_lookup(lexeme);
         if(varlocality < 0) {
-          fprintf(stderr, "parser: %s not declared... fatal error!\n", lexeme);
+          fprintf(erro, "parser: %s not declared... fatal error!\n", lexeme);
 	        syntype = -1;
         } else {
 	        syntype = symtab[varlocality][1];
@@ -566,7 +567,7 @@ int expr(int inherited_type)
 	if(iscompatible(syntype, acctype)) {
 	  acctype = max(acctype,syntype);
 	} else {
-	  fprintf(stderr, "incompatible unary operator: fatal error.\n");
+	  fprintf(erro, "incompatible unary operator: fatal error.\n");
 	}
 	/*]]*/
         match(')');
@@ -658,13 +659,11 @@ int arithmetic_op (void)
 void variable (void)
 {
   /* symbol must be declared */
-  /*[[*/
   if(symtab_lookup(lexeme) == -1) {
-    fprintf(stderr,"FATAL ERROR: symbol not find #:%d",-1);
+    fprintf(erro,"FATAL ERROR: symbol not find #:%d",-1);
     return;
     //exit(-1);
   }
-  /*]]*/
 
   /*[[*/char varname[MAXID_SIZE]/*]]*/;
   /*[[*/strcpy(varname, lexeme)/*]]*/;
@@ -721,11 +720,11 @@ void match (int expected_token)
   if (expected_token == lookahead) {
     lookahead = gettoken (source_code);
   } else {
-    fprintf (stderr, "\nparser: token mismatch error.\n");
-    fprintf (stderr, "expecting %d but seen %d. Exting...\n",
+    fprintf (erro, "\nparser: token mismatch error.\n");
+    fprintf (erro, "expecting %d but seen %d. Exting...\n",
     expected_token, lookahead);
     //exit (SYNTAX_ERR);
-    fprintf(stderr,"FATAL ERROR",SYNTAX_ERR);
+    fprintf(erro,"FATAL ERROR %d",SYNTAX_ERR);
     return;
   }
 }

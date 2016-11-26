@@ -12,11 +12,12 @@ FILE *source_code;
 char palavra_de_saida[] = "done";
 extern int lookahead; // @ parser.c
 
-FILE *source, *object;
+FILE *source, *object,*erro;
 
 int main (int argc, char *argv[], char *envp[])
 {
   object = stdout;
+  erro = fopen("saidadeerros","w+");
   if (argc == 1) {
     /* para remover o modo de leitura de comandos direto do terminal
     comente as 2 linhas seguintes e descomente a terceira
@@ -27,7 +28,7 @@ int main (int argc, char *argv[], char *envp[])
   } else {
     source_code = fopen (argv[1], "r");
     if (source_code == NULL) {
-      fprintf (stderr, "%s: cannot open %s... exiting\n",
+      fprintf (erro, "%s: cannot open %s... exiting\n",
       argv[0], argv[1]);
       exit (-1);
     }

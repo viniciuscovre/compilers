@@ -3,6 +3,6 @@
 
 extern int gettoken(FILE *);
 
-FILE *source, *object;
+FILE *source, *object,*erro;
 
 extern void mypas(void);
