@@ -55,22 +55,48 @@ int rmoveq (char const *variable) // copy of 64 bits
 
 /*unary*/
 
-int neglog(void)
+int neglog(int VAR)
+{
+  /*
+  Assembly parcial de um codigo c,de uma simples operacao a = 1 ,b=!a;
+  pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	subq	$16, %rsp
+	movl	$1, -8(%rbp)
+	cmpl	$0, -8(%rbp)
+	sete	%al
+	movzbl	%al, %eax
+	movl	%eax, -4(%rbp)
+	movl	-4(%rbp), %eax
+	movl	%eax, %esi
+  */
+  fprintf(object, "\tpushq	%%rbp\n");
+  fprintf(object, "\tmovq	%%rsp, %%rbp\n");
+  fprintf(object, "\tsubq	$16, %%rsp\n");
+  fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR);
+  fprintf(object, "\tcmpl	$0, -8(%%rbp)\n");
+  fprintf(object, "\tsete	%%al\n");
+  fprintf(object, "\tmovzbl	%%al, %%eax\n");
+  fprintf(object, "\tmovl	%%eax, -4(%%rbp)\n");
+  fprintf(object, "\tmovl	-4(%%rbp), %%eax\n");
+  fprintf(object, "\tmovl	%%eax, %%esi\n");
+  return 0;
+}
+
+int negint(int VAR)
 {
   return 0;
 }
 
-int negint(void)
+int negflt(float VAR)
 {
   return 0;
 }
 
-int negflt(void)
-{
-  return 0;
-}
-
-int negdbl(void)
+int negdbl(double VAR)
 {
   return 0;
 }
