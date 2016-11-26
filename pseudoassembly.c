@@ -88,16 +88,140 @@ int neglog(int VAR)
 
 int negint(int VAR)
 {
-  return 0;
+return neglog(VAR);
 }
 
 int negflt(float VAR)
 {
+  /*
+  Assembly de negflt.c
+  pushq	%%rbp
+  movq	%%rsp, %%rbp
+  subq	$16, %%rsp
+  movss	.LC0(%%rip), %%xmm0m
+  movss	%%xmm0, -8(%%rbp)
+  pxor	%%xmm0, %%xmm0
+  ucomiss	-8(%%rbp), %%xmm0
+  jp	.L2
+  pxor	%%xmm0, %%xmm0
+  ucomiss	-8(%%rbp), %%xmm0
+  jne	.L2
+  movss	.LC2(%%rip), %%xmm0
+  jmp	.L4
+.L2:
+  pxor	%%xmm0, %%xmm0
+.L4:
+  movss	%%xmm0, -4(%%rbp)
+  cvtss2sd	-4(%%rbp), %%xmm0
+  .align 4
+.LC0:
+  .long	1066359849
+  .align 4
+.LC2:
+  .long	1065353216
+  */
+  fprintf(object, "\tpushq	%%rbp\n");
+  fprintf(object, "\tmovq	%%rsp, %%rbp\n");
+  fprintf(object, "\tsubq	$16, %%rsp\n");
+  fprintf(object, "\tmovss	.LC0(%%rip), %%xmm0m\n");
+  fprintf(object, "\tmovss	%%xmm0, -8(%%rbp)\n");
+  fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
+  fprintf(object, "\tucomiss	-8(%%rbp), %%xmm0\n");
+  labelcounter++;
+  labelcounter++;
+  fprintf(object, "\tjp	.%d\n",labelcounter);
+  fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
+  fprintf(object, "\tucomiss	-8(%%rbp), %%xmm0\n");
+  fprintf(object, "\tjne	.L%d\n",labelcounter);
+  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  labelcounter++;
+  labelcounter++;
+  fprintf(object, "\tjmp	.L%d\n",labelcounter);
+  fprintf(object, "L%d:\n",labelcounter -2);
+  fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
+  fprintf(object, ".L%d:\n",labelcounter);
+  fprintf(object, "\tmovss	%%xmm0, -4(%%rbp)\n");
+  fprintf(object, "\tcvtss2sd	-4(%%rbp), %%xmm0\n");
+  fprintf(object, "\t.align 4\n");
+  fprintf(object, "\t.LC%d:\n",labelcounter - 4);
+  fprintf(object, "\t.long	VAR1?\n");
+  fprintf(object, "\t.align 4\n");
+  fprintf(object, "\t.LC%d:\n",labelcounter - 2);
+  fprintf(object, "\t.long	-VAR1?\n");
   return 0;
 }
 
 int negdbl(double VAR)
 {
+  /*
+  Assembly de negdbl.c
+  pushq	%rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	movq	%rsp, %rbp
+	.cfi_def_cfa_register 6
+	movsd	.LC0(%rip), %xmm0
+	movsd	%xmm0, -16(%rbp)
+	pxor	%xmm0, %xmm0
+	ucomisd	-16(%rbp), %xmm0
+	jp	.L2
+	pxor	%xmm0, %xmm0
+	ucomisd	-16(%rbp), %xmm0
+	jne	.L2
+	movsd	.LC2(%rip), %xmm0
+	jmp	.L4
+.L2:
+	pxor	%xmm0, %xmm0
+.L4:
+	movsd	%xmm0, -8(%rbp)
+	movl	$0, %eax
+	popq	%rbp
+	.cfi_def_cfa 7, 8
+	ret
+	.cfi_endproc
+.LFE0:
+	.size	main, .-main
+	.section	.rodata
+	.align 8
+.LC0:
+	.long	605830907
+	.long	1072822596
+	.align 8
+.LC2:
+	.long	0
+	.long	1072693248
+  */
+  fprintf(object, "\tpushq	%%rbp\n");
+  fprintf(object, "\tmovq	%%rsp, %%rbp\n");
+  labelcounter++;
+  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  fprintf(object, "\tmovsd	%%xmm0, -16(%%rbp)\n");
+  fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
+  fprintf(object, "\tucomisd	-16(%%rbp), %%xmm0\n");
+  labelcounter++;
+  labelcounter++;
+  fprintf(object, "\tjp	.L%d\n",labelcounter);
+  fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
+  fprintf(object, "\tucomisd	-16(%%rbp), %%xmm0\n");
+  fprintf(object, "\tjne	.L%d\n",labelcounter);
+  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  labelcounter++;
+  labelcounter++;
+  fprintf(object, "\tjmp	.L%d\n",labelcounter);
+  fprintf(object, ".L%d:\n",labelcounter-2);
+  fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
+  fprintf(object, ".L%d:\n",labelcounter);
+  fprintf(object, "\tmovsd	%%xmm0, -8(%%rbp)\n");
+  fprintf(object, "\tmovl	$0, %%eax\n");
+  fprintf(object, "\tpopq	%%rbp\n");
+  fprintf(object, "\t.align 8\n");
+  fprintf(object, ".LC%d:\n",labelcounter-4);
+  fprintf(object, "\t.long	605830907\n");
+  fprintf(object, "\t.long	1072822596\n");
+  fprintf(object, "\t.align 8\n");
+  fprintf(object, "LC%d:\n",labelcounter-2);
+  fprintf(object, "\t.long	0\n");
+  fprintf(object, "\t.long	1072693248\n");
   return 0;
 }
 
@@ -107,7 +231,7 @@ int addlog(int VAR1,int VAR2)
 {
 /*
 Assembly parcial de um codigo c,de uma simples operacao c = 1 OR 0;
-pushq	%rbp
+pushq	%%rbp
 .cfi_def_cfa_offset 16
 .cfi_offset 6, -16
 movq	%rsp, %rbp

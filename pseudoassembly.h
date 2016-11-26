@@ -18,10 +18,10 @@ int rmoveq (char const *variable);
 /*ULA pseudo-instructions*/
 
 /*unary*/
-int neglog(void);
-int negint(void);
-int negflt(void);
-int negdbl(void);
+int neglog(int VAR);
+int negint(int VAR);
+int negflt(float VAR);
+int negdbl(double VAR);
 
 /*binary addition and inversion*/
 int addlog(int VAR1,int VAR2);
