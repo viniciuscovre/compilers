@@ -4,12 +4,15 @@
 #include <parser.h>
 #include <lexer.h>
 
-// collumn 0 of symtab : the name of the symbol
-// collumn 1 of symtab : value of the next entry
+// col 0 of symtab: location of the symbol (symtab[i][1]) in the symtab_stream
+// col 1 of symtab: the name of the symbol
 int symtab[MAX_SYMTAB_ENTRIES][2];
 int symtab_nextentry = 0; // position of next entry in symtab
 
+// symtab_stream: array with all the declared symbols
+// the right position of a symbol in the symtab_stream is stored in symtab
 char symtab_stream[MAX_SYMTAB_ENTRIES*(MAXID_SIZE+1)];
+// position of next item in the symtab_stream
 int symtab_stream_next_descriptor = 0;
 
 int symtab_lookup(char const *name)
@@ -20,7 +23,7 @@ int symtab_lookup(char const *name)
    if( strcmp(symtab_stream + symtab[i][0],name) == 0)
     break;
   }
-  // at this point 'i' is either the value that we want or -1, when didn't find
+  // at this point 'i' is either the value we want or -1, when didn't find
   return i;
 }
 
