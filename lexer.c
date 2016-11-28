@@ -1,17 +1,11 @@
 /**@<lexer.c>::**/
 
-/*
-
-Vina - Modificado 31 de Outubro de 2016
-
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <tokens.h>
+#include <keywords.h>
 #include <lexer.h>
-#include <keywords.c>
 
 void skipspaces (FILE *tape)
 {

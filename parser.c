@@ -35,21 +35,20 @@
 */
 
 /* system include */
+#include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 /* local include */
 #include <tokens.h>
-#include <parser.h>
 #include <lexer.h>
 #include <keywords.h>
 #include <symtab.h>
 #include <mypas.h>
 #include <macros.h>
 #include <pseudoassembly.h>
-
-#define MAX_ARG_NUM 1024
+#include <parser.h>
 
 char **namelist(void);
 
@@ -100,6 +99,7 @@ int iscmdsep(void)
 // mypas -> prgbody '.'
 void mypas(void)
 {
+  lookahead = gettoken (source_code);
   body();
   match('.');
 }
@@ -137,23 +137,6 @@ void declarative(void)
     } while(lookahead == ID);
 
   }
-
-/*
-// NOT IMPLEMENTED FOR THE FINAL PROJECT...
-// PROJECT IS A *REDUCED* VERSION OF THE PASCAL COMPILER
-  while(lookahead == PROCEDURE || lookahead == FUNCTION) {
-    match(lookahead);
-    match(ID);
-    parmdef();
-    if(lookahead == ':') {
-      match(':');
-      fnctype();
-      match(';');
-      body();
-      match(';');
-    }
-  }
-*/
 }
 
 // fnctype -> INTEGER | REAL | BOOLEAN

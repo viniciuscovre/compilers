@@ -38,6 +38,7 @@
 
  #define MAXSYMTAB_ENTRIES 0x10000
  #define MAXSTACK_SIZE     0x40
+ #define MAX_ARG_NUM 1024
 
 /* expr -> term rest */
 int expr(int inherited_type);

@@ -1,10 +1,10 @@
 TO DO
 - No compilador, comando é uma sentença(todo comando é uma sentença, nem toda sentença é um comando)
 // em keywords.[ch]
-- colocar erros em um arquivo separado e exibir ao fim da compilação FEITO
 - preencher pseudoassembly.c FEITO BOA PARTE, FALTAM COISAS (revisar o pseudo assembly feito em sala, modificar a parte dos double onde diz VAR1_parteAlta/baixa,e mais uns)
 - encaixar as chamadas de funcoes do pseudoassembly Yuji
-- organizar de acordo com o comentario do eraldo 
+- gerar arquivo .s com código assembly quando no terminal executado "mypas -S" (ou algo do tipo)
+- verificar arquivo de entrada (deve aceitar somente extensão .pas)
 
 
 http://primepuzzle.com/tp2/syntax-diagrams.html
