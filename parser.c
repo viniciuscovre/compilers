@@ -560,17 +560,16 @@ int expr(int inherited_type)
 
       default:
         match('(');
-	/*[[*/syntype = /*]]*/
-        superexpr(0);
-	//superexpr --> pode ter um operador relacional
-	//expr --> nao pode ter operador relacional a não ser que dentro de parentesis
-	/*[[*/
-	if(iscompatible(syntype, acctype)) {
-	  acctype = max(acctype,syntype);
-	} else {
-	  fprintf(erro, "incompatible unary operator: fatal error.\n");
-	}
-	/*]]*/
+	/*[[*/syntype = /*]]*/ superexpr(0);
+
+	      /*[[*/
+	      if(iscompatible(syntype, acctype)) {
+	         acctype = max(acctype,syntype);
+	      } else {
+	         fprintf(erro, "incompatible unary operator: fatal error.\n");
+	      }
+	      /*]]*/
+
         match(')');
     }
 
