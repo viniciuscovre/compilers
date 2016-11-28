@@ -408,23 +408,23 @@ int iscompatible(int ltype, int rtype)
     case BOOLEAN:
     case INTEGER:
       if(rtype == ltype)
-	return ltype;
+        return ltype;
       break;
 
     case REAL:
       switch(rtype) {
-	case INTEGER:
-	case REAL:
-	  return ltype;
+	       case INTEGER:
+         case REAL:
+          return ltype;
       }
       break;
 
     case DOUBLE:
       switch(rtype) {
-	case INTEGER:
-	case REAL:
-	case DOUBLE:
-	  return ltype;
+	       case INTEGER:
+         case REAL:
+         case DOUBLE:
+      return ltype;
       }
   }
   return 0;
@@ -464,10 +464,9 @@ int isrelop(void)
 int superexpr(int inherited_type)
 {
   int t1, t2;
-  t1 = expr(inherited_type); //t1 é para o lado esquerdo da expr
-  if(isrelop()) { //so passo para t2 se vier relop
+  t1 = expr(inherited_type); //t1 é para o lado direito da expr
+  if(isrelop()) { //so passo para verificar o tipo se vier relop
     t2 = expr(t1);
-    //TODO: VERIFICAR COMPATIBILIDADE de t1 com t2!
     if(iscompatible(t1,t2)) {
        fprintf(erro, "incompatible operation %d with %d: fatal error.\n",t1,t2);
     }
