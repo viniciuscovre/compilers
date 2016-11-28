@@ -123,14 +123,16 @@ void declarative(void)
       match(':');
       // get the type of the declared variables
       /*[[*/ type =  /*]]*/ vartype();
+
       // insert name values and types of the variables in the symtab
-      /*[[*/ for(i=0; namev[i]; i++)
-                {
-                  if(symtab_append(namev[i], type)==-2)
-                  fprintf(erro,"FATAL ERROR: -2 no more space in symtab");
-                  else if (symtab_append(namev[i], type)==-3)
-                  fprintf(erro,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]); /*]]*/
-                }
+      /*[[*/
+      for(i=0; namev[i]; i++) {
+        if(symtab_append(namev[i], type) == -2)
+          fprintf(erro,"FATAL ERROR: -2 no more space in symtab");
+        else if (symtab_append(namev[i], type) == -3)
+          fprintf(erro,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]);
+      }
+      /*]]*/
       match(';');
     } while(lookahead == ID);
 
