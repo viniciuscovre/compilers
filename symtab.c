@@ -4,8 +4,8 @@
 #include <parser.h>
 #include <lexer.h>
 
-// col 0 of symtab: location of the symbol (symtab[i][1]) in the symtab_stream
-// col 1 of symtab: the name of the symbol
+// col 0 of symtab: location of the symbol name(symtab[i][1]) in the symtab_stream
+// col 1 of symtab: the type of the symbol
 int symtab[MAX_SYMTAB_ENTRIES][2];
 int symtab_nextentry = 0; // position of next entry in symtab
 
