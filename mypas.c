@@ -9,7 +9,9 @@ FILE *source_code, *object;
 
 int main (int argc, char *argv[], char *envp[])
 {
-  object = stdout; //TODO: ciar arquivo.s para gerar o assembly, não apenas em STDOUT
+  //TODO: ciar arquivo.s para gerar o assembly, não apenas em STDOUT
+  object = stdout;
+
   if (argc == 1) {
     fprintf(stderr, "%s: cannot compile without an input file... exiting\n", argv[0]);
     exit (-1);

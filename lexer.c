@@ -64,7 +64,7 @@ int is_decimal(FILE *tape)
         // ungetc (lexeme[i], tape);
         return INTCONST;
       } else if (lexeme[i] == '.' || tolower(lexeme[i]) == 'e') {
-        //for later float verification ~vina
+        //for later float verification
         ungetc (lexeme[i], tape);
         lexeme[i] = 0;
         return INTCONST;
@@ -76,12 +76,6 @@ int is_decimal(FILE *tape)
     }
     // [0-9]*
     for (i=1; isdigit (lexeme[i] = getc(tape)); i++);
-    // if(lexeme[i] == '.' || tolower(lexeme[i]) == 'e') {
-    // //for later float verification ~vina
-    //   ungetc (lexeme[i], tape);
-    //   lexeme[i] = 0;
-    //   return DEC;
-    // }
     ungetc (lexeme[i], tape);
     lexeme[i] = 0;
     return INTCONST;
@@ -150,7 +144,7 @@ EXP =  ('E'|'e') (‘+’|‘-’)? DIGIT+  */
 int is_float(FILE *tape) {
 
   int i;
-  if (is_decimal(tape)) { //inicia com dec
+  if (is_decimal(tape)) { // begins as decimal
 
     i = strlen(lexeme);
     lexeme[i] = getc(tape);

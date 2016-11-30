@@ -58,7 +58,7 @@ int rmoveq (char const *variable) // copy of 64 bits
 int neglog(int VAR)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao a = 1 ,b=!a;
+  Partial assembly of a C code... Simple operation: a = 1; b != a;
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -94,7 +94,7 @@ return neglog(VAR);
 int negflt(float VAR)
 {
   /*
-  Assembly de negflt.c
+  Assembly of negflt.c
   pushq	%%rbp
   movq	%%rsp, %%rbp
   subq	$16, %%rsp
@@ -154,7 +154,7 @@ int negflt(float VAR)
 int negdbl(double VAR)
 {
   /*
-  Assembly de negdbl.c
+  Assembly of negdbl.c
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -230,7 +230,7 @@ int negdbl(double VAR)
 int addlog(int VAR1,int VAR2)
 {
 /*
-Assembly parcial de um codigo c,de uma simples operacao c = 1 OR 0;
+Partial assembly of a C code... Simple operation: c = 1 OR 0;
 pushq	%%rbp
 .cfi_def_cfa_offset 16
 .cfi_offset 6, -16
@@ -327,7 +327,7 @@ int adddbl(double VAR1, double VAR2)
 int subint(int VAR1,int VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 25 - 7;
+  Partial assembly of a C code... Simple operation: c = 25 - 7;
   pushq	%rbp
   .cfi_def_cfa_offset 16
   .cfi_offset 6, -16
@@ -362,7 +362,7 @@ int subint(int VAR1,int VAR2)
 int subflt(float VAR1,float VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 10.20 - 2.34
+  Partial assembly of a C code... Simple operation: c = 10.20 - 2.34;
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -412,7 +412,7 @@ int subflt(float VAR1,float VAR2)
 int subdbl(double VAR1,double VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 10.20 - 2.34,sendo as variaveis envolvidas double
+  Partial assembly of a C code... Simple operation: c = 10.20 - 2.34, being sent double variables;
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -457,12 +457,12 @@ int subdbl(double VAR1,double VAR2)
   fprintf(object, "\tmovq	%%rax, -40(%%rbp)\n");
   fprintf(object, "\tmovsd	-40(%%rbp), %%xmm0\n");
   fprintf(object, ".LC%d:\n",labelcounter-1);
-  fprintf(object, "\t.long	VAR1_parteAlta\n"/*VAR1 parte alta*/);
-  fprintf(object, "\t.long	VAR1_parteBaixa\n"/*VAR1 parte baixa*/);
+  fprintf(object, "\t.long	VAR1_parteAlta\n"/*VAR1 high part*/);
+  fprintf(object, "\t.long	VAR1_parteBaixa\n"/*VAR1 low part*/);
   fprintf(object, "\t.align 8\n");
   fprintf(object, ".LC%d:\n",labelcounter);
-  fprintf(object, "\t.long	VAR2_parteAlta\n"/*,VAR2 parte alta*/);
-  fprintf(object, "\t.long	VAR2_parteBaixa\n"/*,VAR2 parte baixa*/);
+  fprintf(object, "\t.long	VAR2_parteAlta\n"/*,VAR2 high part*/);
+  fprintf(object, "\t.long	VAR2_parteBaixa\n"/*,VAR2 low part*/);
   return 0;
 }
 
@@ -471,7 +471,7 @@ int subdbl(double VAR1,double VAR2)
 int mullog(int VAR1,int VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 1 && 0;
+  Partial assembly of a C code... Simple operation: c = 1 && 0;
   movl	$1, -12(%rbp)
   movl	$0, -8(%rbp)
   cmpl	$0, -12(%rbp)
@@ -511,7 +511,7 @@ int mullog(int VAR1,int VAR2)
 int mulint(int VAR1,int VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 7 * 8;
+  Partial assembly of a C code... Simple operation: c = 7 * 8;
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -544,7 +544,7 @@ int mulint(int VAR1,int VAR2)
 int mulflt(float VAR1,float VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 7 * 8, sendo 7 e 8 double
+  Partial assembly of a C code... Simple operation: c = 7 * 8; being both 7 and 8 double.
   pushq	%rbp
   movq	%rsp, %rbp
   subq	$16, %rsp
@@ -594,7 +594,7 @@ int mulflt(float VAR1,float VAR2)
 int muldbl(double VAR1,double VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 7.31 * 8,91, sendo 7 e 8 double
+  Partial assembly of a C code... Simple operation: c = 7.31 * 8,91; being both 7 and 8 double.
   pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$48, %rsp
@@ -646,7 +646,7 @@ int muldbl(double VAR1,double VAR2)
 int divint(int VAR1,int VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao c = 4 / 2, sendo 4 e 2 int
+  Partial assembly of a C code... Simple operation: c = 4 / 2; being both 4 and 2 int.
   pushq	%rbp
   .cfi_def_cfa_offset 16
   .cfi_offset 6, -16
@@ -679,7 +679,7 @@ int divint(int VAR1,int VAR2)
 int divflt(float VAR1,float VAR2)
 {
   /*
-  Assembly parcial de um codigo c,de uma simples operacao a = 15.321 e b = 2.1; c = a / b;
+  Partial assembly of a C code... Simple operation: a = 15.321 e b = 2.1; c = a / b;
   pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$16, %rsp

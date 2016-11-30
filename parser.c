@@ -381,7 +381,6 @@ void repeatstmt(void)
  *  REAL      |    N/A   |   REAL  |   REAL  |    N/A
  *  DOUBLE    |    N/A   |  DOUBLE |  DOUBLE |   DOUBLE
  *
- *  TUDO ISSO TEM Q VIRAR IF DENTRO DA EXPRESSAO
  */
 
 int iscompatible(int ltype, int rtype)
@@ -447,8 +446,8 @@ int isrelop(void)
 int superexpr(int inherited_type)
 {
   int t1, t2;
-  t1 = expr(inherited_type); //t1 é para o lado direito da expr
-  if(isrelop()) { //so passo para verificar o tipo se vier relop
+  t1 = expr(inherited_type); // t1 is for the right side of the expression
+  if(isrelop()) { // verifies only when it comes a relational operator
     t2 = expr(t1);
     if(iscompatible(t1,t2)) {
        fprintf(erro, "incompatible operation %d with %d: fatal error.\n",t1,t2);
@@ -565,14 +564,13 @@ int expr(int inherited_type)
     /*[[*/
     if(lvalue_seen && varlocality > -1) {
       switch(ltype) {
-        //verifica com que tipo de instruções vai trabalhar
-        //se de 32 bits ou 64 bits
+        // verify which kind of instructions will be worked
         case INTEGER: case REAL: case BOOLEAN:
-          lmovel(symtab_stream + symtab[varlocality][0]);
+          lmovel(symtab_stream + symtab[varlocality][0]); // when 32-bit operation
           break;
 
         case DOUBLE:
-          lmoveq(symtab_stream + symtab[varlocality][0]);
+          lmoveq(symtab_stream + symtab[varlocality][0]); // when 64-bit operation
           break;
 
         default: //case  BOOLEAN
@@ -681,14 +679,14 @@ int hexToInt(char hexToConvert[])
   int len = strlen(hexToConvert);
   char aux[len-2];
 
-  for(j = 2; j < len; j++) //removing 2 prefixes (0x) of hexadecimal ~vina
+  for(j = 2; j < len; j++) //removing 2 prefixes (0x) of hexadecimal
   {
     aux[j-2] = hexToConvert[j];
   }
-  aux[(len-2)-1] = 0; //closing string with '/0' ~vina
+  aux[(len-2)-1] = 0; //closing string with '/0'
 
 
-  int hex = (int)strtol(aux, NULL, 16); //hex --> decimal ~vina
+  int hex = (int)strtol(aux, NULL, 16); //hex --> decimal
   return hex;
 }
 
