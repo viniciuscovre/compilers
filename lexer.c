@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include <tokens.h>
 #include <keywords.h>
 #include <lexer.h>

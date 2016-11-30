@@ -35,7 +35,7 @@
 */
 
 /* system include */
-#include <malloc.h>
+// #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -591,7 +591,7 @@ int addop (void)
   {
     case '+':
       match('+');
-      addint();
+      // addint();
       return '+';
 
     case '-':
