@@ -35,7 +35,7 @@
 */
 
 /* system include */
-#include <malloc.h>
+// #include <malloc.h>©
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -390,20 +390,42 @@ int isrelop(void)
 int expr(int inherited_type)
 {
   int t1;
-  t1 = smpexpr(inherited_type); // t1 is for the right side of the smpexpression
+  t1 = smpexpr(0); // t1 is for the right side of the smpexpression
+  int t2 = 0;
+
+
   if(isrelop()) { // verifies only when it comes a relational operator
-    int t2 = smpexpr(t1);
+     t2 = smpexpr(t1);
+
     if(iscompatible(t1,t2)) {
+      //	cmpl();
+    } else {
        fprintf(stderr, "%d: incompatible operation %d with %d: fatal error.\n",semanticErrorNum(),t1,t2);
+       return -1;
     }
-    return t2;
   }
-  return t1;
+
+  if(t2){
+    if(t1 == t2 && t1 == BOOLEAN || t1 > BOOLEAN && t2 > BOOLEAN){
+      return BOOLEAN;
+    } else {
+     if((inherited_type == BOOLEAN && t1 > BOOLEAN) || (t1 == BOOLEAN && inherited_type > BOOLEAN)){
+       fprintf(stderr, "%d: incompatible operation %d with %d: fatal error.\n",semanticErrorNum(),t1,t2);
+       return -1;
+     } else {
+      return max(t1,inherited_type);
+     }
+
+    }
+  }
+  return -1;
 }
 
 int smpexpr(int inherited_type)
 {
   /*[[*/int
+	add_flag = 0,
+	mul_flag = 0,
 	varlocality,             // position of a variable in symtab
 	lvalue_seen = 0,         // flag is 1 when see LVALUE [before]
 	acctype = inherited_type,// accumulated type [after]
@@ -444,25 +466,27 @@ int smpexpr(int inherited_type)
 	        syntype = symtab[varlocality][1];
 	      }
         /*]]*/
+	if (acctype == 0){
+	  acctype = syntype;
+	}
         match(ID);
         if (lookahead == ASGN) {
-          /* located variable is LVALUE */
-          /*[[*/
-	        lvalue_seen = 1;
-	        ltype = syntype;
-	        /*]]*/
-          match(ASGN);
-          //verify if rtype changes symbol type...
-	        /*[[*/ rtype = /*]]*/ expr(/*[[*/ltype/*]]*/);
+	    /* located variable is LVALUE */
+	    /*[[*/
+		  lvalue_seen = 1;
+		  ltype = syntype;
+		  /*]]*/
+	    match(ASGN);
+	    rtype = expr(/*[[*/ltype/*]]*/);
 
-      	  /*[[*/
-      	  if(iscompatible(ltype, rtype)) {
-      	    acctype = max(rtype,acctype);
-      	  } else {
-      	    acctype = -1;
-      	  }
-      	  /*]]*/
-	      } /*[[*/ else if(varlocality > -1) {
+	    /*[[*/
+	    if(iscompatible(ltype, rtype)) {
+	      acctype = max(rtype,acctype);
+	    } else {
+	      acctype = -1;
+	    }
+	    /*]]*/
+	} /*[[*/ else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
         }
@@ -473,15 +497,24 @@ int smpexpr(int inherited_type)
         {
           float lexval = atof(lexeme);
           char *fltIEEE = malloc(sizeof(lexeme) + 1);
-          /*[[*/sprintf(fltIEEE, "$%i", *((int *)&lexval) );/*]]*/
+          /*[[*/sprintf(fltIEEE, "$%i", ((int *)&lexval) );/*]]*/
           /*[[*/rmovel(fltIEEE);/*]]*/
         }
         match(FLTCONST);
+	syntype = REAL;
+	if (acctype > BOOLEAN || acctype == 0) {
+	    acctype = max(acctype, syntype);
+	}
         break;
 
       case INTCONST:
 	     /*[[*/rmovel((char*)lexeme);/*]]*/
         match(INTCONST);
+	syntype = INTEGER;
+	if (acctype > BOOLEAN || acctype == 0) {
+	    acctype = max(acctype, syntype);
+	}
+
         break;
 
       default:
@@ -492,15 +525,26 @@ int smpexpr(int inherited_type)
 	      if(iscompatible(syntype, acctype)) {
 	         acctype = max(acctype,syntype);
 	      } else {
+		 printf("default");
 	         fprintf(stderr, "%d: incompatible unary operator: fatal error.\n", semanticErrorNum());
+		 acctype = -1;
 	      }
 	      /*]]*/
         match(')');
     }
 
-    if(mulop())
+     if(mul_flag){
+       mulint();
+    }
+
+    if(mul_flag = mulop())
       goto F_entry;
-    if(addop())
+
+    if(add_flag){
+       addint();
+    }
+
+    if(add_flag = addop())
       goto T_entry;
     /* smpexpression ends down here */
 
@@ -522,7 +566,7 @@ int smpexpr(int inherited_type)
       }
     }
     /*]]*/
-    return 0;
+    return acctype;
 }
 
 /* addop -> + | - | OR */

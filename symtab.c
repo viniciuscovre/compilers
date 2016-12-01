@@ -40,6 +40,7 @@ int symtab_append(char const *name, int type)
   // stroe the stream position in the symtab array
   symtab[symtab_nextentry][0] = symtab_stream_next_descriptor;
   // preview next stream entry position
+  symtab[symtab_nextentry][1] = type;
   symtab_stream_next_descriptor += strlen(name) +1;
 
   return symtab_nextentry++;
