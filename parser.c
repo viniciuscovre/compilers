@@ -128,9 +128,9 @@ void declarative(void)
       /*[[*/
       for(i=0; namev[i]; i++) {
         if(symtab_append(namev[i], type) == -2)
-          fprintf(erro,"FATAL ERROR: -2 no more space in symtab");
+          fprintf(stderr,"FATAL ERROR: -2 no more space in symtab");
         else if (symtab_append(namev[i], type) == -3)
-          fprintf(erro,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]);
+          fprintf(stderr,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]);
       }
       /*]]*/
       match(';');
@@ -450,7 +450,7 @@ int superexpr(int inherited_type)
   if(isrelop()) { // verifies only when it comes a relational operator
     t2 = expr(t1);
     if(iscompatible(t1,t2)) {
-       fprintf(erro, "incompatible operation %d with %d: fatal error.\n",t1,t2);
+       fprintf(stderr, "incompatible operation %d with %d: fatal error.\n",t1,t2);
     }
   }
   return min(BOOLEAN, t2);
@@ -470,7 +470,7 @@ int expr(int inherited_type)
     match('-');
     /*[[*/
     if(acctype == BOOLEAN) { // "minus" isn't compatible with boolean operation
-      fprintf(erro, "incompatible unary operator: fatal error.\n");
+      fprintf(stderr, "incompatible unary operator: fatal error.\n");
     } else if (acctype == 0) {
       acctype = INTEGER;
     }
@@ -479,7 +479,7 @@ int expr(int inherited_type)
     match(NOT);
     /*[[*/
     if(acctype > BOOLEAN) { // "not" isn't compatible with non-boolean operation
-      fprintf(erro, "incompatible unary operator: fatal error.\n");
+      fprintf(stderr, "incompatible unary operator: fatal error.\n");
     }
     acctype = BOOLEAN;
     /*]]*/
@@ -493,7 +493,7 @@ int expr(int inherited_type)
         /*[[*/
         varlocality = symtab_lookup(lexeme);
         if(varlocality < 0) {
-          fprintf(erro, "parser: %s not declared... fatal error!\n", lexeme);
+          fprintf(stderr, "parser: %s not declared... fatal error!\n", lexeme);
 	        syntype = -1;
         } else {
 	        syntype = symtab[varlocality][1];
@@ -548,7 +548,7 @@ int expr(int inherited_type)
 	      if(iscompatible(syntype, acctype)) {
 	         acctype = max(acctype,syntype);
 	      } else {
-	         fprintf(erro, "incompatible unary operator: fatal error.\n");
+	         fprintf(stderr, "incompatible unary operator: fatal error.\n");
 	      }
 	      /*]]*/
 
@@ -641,7 +641,7 @@ void variable (void)
 {
   /* symbol must be declared */
   if(symtab_lookup(lexeme) == -1) {
-    fprintf(erro,"FATAL ERROR: symbol not find #:%d",-1);
+    fprintf(stderr,"FATAL ERROR: symbol not find #:%d",-1);
     return;
     //exit(-1);
   }
@@ -694,18 +694,16 @@ int hexToInt(char hexToConvert[])
 
 int lookahead; /** @ parser **/
 
-extern int gettoken (FILE *); /** @ lexer **/
-
 void match (int expected_token)
 {
   if (expected_token == lookahead) {
     lookahead = gettoken (source_code);
   } else {
-    fprintf (erro, "\nparser: token mismatch error.\n");
-    fprintf (erro, "expecting %d but seen %d. Exting...\n",
+    fprintf (stderr, "\nparser: token mismatch error.\n");
+    fprintf (stderr, "expecting %d but seen %d. Exting...\n",
     expected_token, lookahead);
     //exit (SYNTAX_ERR);
-    fprintf(erro,"FATAL ERROR %d",SYNTAX_ERR);
+    fprintf(stderr,"FATAL ERROR %d",SYNTAX_ERR);
     return;
   }
 }
