@@ -10,11 +10,6 @@ VAR1_parteAlta/baixa,e mais uns)
 
 - encaixar as chamadas de funcoes do pseudoassembly!!!
 
-- gerar arquivo .s com código assembly quando no terminal executado "mypas -S"
-(ou algo do tipo)
-
-- criar token de "file not found" ao invés de usar sempre return -1 ou exit(-1)
-
 - criar contador de erros para erros semânticos (que devem ser listados ao fim
 da compilação), não para erros sintáticos, pois eles são fatais
 
@@ -22,6 +17,5 @@ da compilação), não para erros sintáticos, pois eles são fatais
 o erro sintático q força o exit
 
 - verificar iscompatible();
-
 
 http://primepuzzle.com/tp2/syntax-diagrams.html
