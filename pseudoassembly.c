@@ -108,15 +108,18 @@ int addint(void)
 
 int addflt(void)
 {
-  fprintf(object, "\tmovss .LC%d(%%rip), %%xmm0\n",labelcounter);
+  fprintf(object, "\tmovss (%%rsp), %%xmm0\n",labelcounter);
+  fprintf(object, "\tmovss %%rax, %%xmm1\n",labelcounter);
   fprintf(object, "\taddss %%xmm1, %%xmm0\n");
+  fprintf(object, "\tmovss %%xmm0, %%rax\n",labelcounter);
+  fprintf(object, "\taddq $8,%%rsp\n");
   return 0;
 }
 
 int adddbl(void)
 {
   fprintf(object, "\tmovsd .LC%d(%%rip), %%xmm0\n",labelcounter);
-  fprintf(object, "\tmulss %%rbp, %%xmm0\n"); 
+  fprintf(object, "\tmulss %%rbp, %%xmm0\n");
   return 0;
 }
 
@@ -124,7 +127,7 @@ int subint(void)
 {
  fprintf(object, "\tsubl %%esp,%%eax\n");
  fprintf(object, "\tpopl %%eax\n");
-  
+
   return 0;
 }
 
@@ -138,7 +141,7 @@ int subflt(void)
 int subdbl(void)
 {
  fprintf(object, "\tmovsd .LC%d(%%rip), %%xmm0\n",labelcounter);
- fprintf(object, "\tsubsd %%rbp, %%xmm0\n"); 
+ fprintf(object, "\tsubsd %%rbp, %%xmm0\n");
   return 0;
 }
 
@@ -159,7 +162,7 @@ int mulint(void)
 }
 
 int mulflt(void)
-{	
+{
   fprintf(object, "\tmovss .LC%d(%%rip), %%xmm0\n",labelcounter);
   fprintf(object, "\tmulss %%rbp), %%xmm0\n");
   return 0;
