@@ -1,3 +1,4 @@
+/**@<pseudoassembly.h>::**/
 #include <mypas.h>
 
 /*unified label counter*/
@@ -8,6 +9,13 @@ extern int labelcounter;
 
 int gofalse(int label);
 int jump (int label);
+int jle(int label);
+int jlt(int label);
+int jge(int label);
+int jgt(int label);
+int jeq(int label);
+int jne(int label);
+int cmpl();
 int mklabel (int label);
 int lmovel (char const *variable);
 int lmoveq (char const *variable);
