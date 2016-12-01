@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <lexer.h>
 #include <string.h>
+#include <symtab.h>
 #include <mypas.h>
 
 FILE *source_code, *object;
@@ -10,8 +11,8 @@ FILE *source_code, *object;
 int main (int argc, char *argv[], char *envp[])
 {
   //TODO: ciar arquivo.s para gerar o assembly, não apenas em STDOUT
+  //object = fopen("arquivo.s", "ab+");
   object = stdout;
-
   if (argc == 1) {
     fprintf(stderr, "%s: cannot compile without an input file... exiting\n", argv[0]);
     exit (-1);
@@ -32,6 +33,7 @@ int main (int argc, char *argv[], char *envp[])
     }
   }
   mypas();
+  print_symtab_stream();
   printf("\n");
   exit (0);
 }

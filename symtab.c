@@ -45,3 +45,21 @@ int symtab_append(char const *name, int type)
 
   return symtab_nextentry++;
 }
+
+//print_symtab_stream: a function to print the entire symtab, useful for debug purposes
+void print_symtab_stream(void)
+{
+  int a,b,fim,ini;
+  for (a=0;a<symtab_nextentry;a++)  
+  {
+    //find where some variable starts in stream
+    b = symtab[a][0];
+    printf("\nsymtab entry #%d ",a);
+    //print until the end of such variable
+    while(symtab_stream[b]!='\0')
+    {
+    printf("%c",symtab_stream[b]);
+    b++;
+    }
+  }
+}

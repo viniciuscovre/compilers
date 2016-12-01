@@ -50,8 +50,11 @@
 #include <pseudoassembly.h>
 #include <parser.h>
 
-char **namelist(void);
 
+int flag_int = 0;
+int flag_dbl = 0;
+
+char **namelist(void);
 /*
 * cmdsep -> ';' | '\n'
 */
@@ -64,6 +67,7 @@ int iscmdsep(void)
   }
   return 0;
 }
+
 
 /*
 *
@@ -130,7 +134,7 @@ void declarative(void)
         if(symtab_append(namev[i], type) == -2)
           fprintf(stderr,"FATAL ERROR: -2 no more space in symtab");
         else if (symtab_append(namev[i], type) == -3)
-          fprintf(stderr,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]);
+	{}// $$$ fprintf(stderr,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]);
       }
       /*]]*/
       match(';');
@@ -492,6 +496,7 @@ int expr(int inherited_type)
       case ID:
         /*[[*/
         varlocality = symtab_lookup(lexeme);
+	printf("lexeme:%s\n",lexeme);
         if(varlocality < 0) {
           fprintf(stderr, "parser: %s not declared... fatal error!\n", lexeme);
 	        syntype = -1;
@@ -509,7 +514,7 @@ int expr(int inherited_type)
           match(ASGN);
           //verify if rtype changes symbol type...
 	        /*[[*/ rtype = /*]]*/ superexpr(/*[[*/ltype/*]]*/);
-
+	  
       	  /*[[*/
       	  if(iscompatible(ltype, rtype)) {
       	    acctype = max(rtype,acctype);
@@ -517,6 +522,16 @@ int expr(int inherited_type)
       	    acctype = -1;
       	  }
       	  /*]]*/
+	  /* $$$ // AQUI TEM UM lmovel
+	  char var_name[255];
+	  int c = symtab[varlocality][0];
+	  while(symtab_stream[c]!='\0')
+	  {
+	    var_name[c]=symtab_stream[c];
+	    c++;
+	  }  
+	  lmovel(var_name); $$$ */
+	  
 	      } /*[[*/ else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
@@ -537,6 +552,7 @@ int expr(int inherited_type)
         break;
 
       case INTCONST:
+	rmovel((char*)lexeme);
         match(INTCONST);
         break;
 
@@ -566,10 +582,14 @@ int expr(int inherited_type)
       switch(ltype) {
         // verify which kind of instructions will be worked
         case INTEGER: case REAL: case BOOLEAN:
+	  /* $$$ flag_int = 1;
+	  flag_dbl = 0; $$$ */
           lmovel(symtab_stream + symtab[varlocality][0]); // when 32-bit operation
           break;
 
         case DOUBLE:
+	  /* $$$ flag_int = 0;
+	  flag_dbl = 1; $$$*/
           lmoveq(symtab_stream + symtab[varlocality][0]); // when 64-bit operation
           break;
 
@@ -589,11 +609,22 @@ int addop (void)
   {
     case '+':
       match('+');
-      // addint();
+      
+      /* $$$ if(flag_int)
+      {*/
+      addint();
+      /*printf("PASSOU AQUI INT\n");
+      }
+      else
+      {
+      adddbl();
+      printf("PASSOU AQUI DBL\n");
+      }	 $$$ */ 
       return '+';
 
     case '-':
       match('-');
+      subint();
       return '-';
 
     case OR:
@@ -610,10 +641,12 @@ int mulop (void)
   {
     case '*':
       match('*');
+      mulint();
       return '*';
 
     case '/':
       match('/');
+      divint();
       return '/';
 
     case AND:
