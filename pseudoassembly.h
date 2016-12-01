@@ -18,27 +18,27 @@ int rmoveq (char const *variable);
 /*ULA pseudo-instructions*/
 
 /*unary*/
-int neglog(int VAR);
-int negint(int VAR);
-int negflt(float VAR);
-int negdbl(double VAR);
+int neglog(void);
+int negint(void);
+int negflt(void);
+int negdbl(void);
 
 /*binary addition and inversion*/
-int addlog(int VAR1,int VAR2);
-int addint(int VAR1,int VAR2);
-int addflt(float VAR1,float VAR2);
-int adddbl(double VAR1,double VAR2);
-int subint(int VAR1,int VAR2);
-int subflt(float VAR1,float VAR2);
-int subdbl(double VAR1,double VAR2);
+int addlog(void);
+int addint(void);
+int addflt(void);
+int adddbl(void);
+int subint(void);
+int subflt(void);
+int subdbl(void);
 
 /*binary multiplication and inverse*/
-int mullog(int VAR1,int VAR2);
-int mulint(int VAR1,int VAR2);
-int mulflt(float VAR1,float VAR2);
-int muldbl(double VAR1,double VAR2);
-int addflt(float VAR1,float VAR2);
-int adddbl(double VAR1,double VAR2);
-int divint(int VAR1,int VAR2);
-int divflt(float VAR1,float VAR2);
-int divdbl(double VAR1,double VAR2);
+int mullog(void);
+int mulint(void);
+int mulflt(void);
+int muldbl(void);
+int addflt(void);
+int adddbl(void);
+int divint(void);
+int divflt(void);
+int divdbl(void);

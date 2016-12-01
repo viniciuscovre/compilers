@@ -55,10 +55,11 @@ int rmoveq (char const *variable) // copy of 64 bits
 
 /*unary*/
 
-int neglog(int VAR)
+int neglog(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: a = 1; b != a;
+  @neglog.s
+  Assembly parcial de um codigo c,de uma simples operacao a = 1 ,b=!a;
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -73,28 +74,30 @@ int neglog(int VAR)
 	movl	-4(%rbp), %eax
 	movl	%eax, %esi
   */
-  fprintf(object, "\tpushq	%%rbp\n");
-  fprintf(object, "\tmovq	%%rsp, %%rbp\n");
-  fprintf(object, "\tsubq	$16, %%rsp\n");
-  fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR);
+  //fprintf(object, "\tpushq	%%rbp\n");
+  //fprintf(object, "\tmovq	%%rsp, %%rbp\n");
+  //fprintf(object, "\tsubq	$16, %%rsp\n");
+  //fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR);
+  //espero que a VAR esteja em -8(%%rbp)
   fprintf(object, "\tcmpl	$0, -8(%%rbp)\n");
   fprintf(object, "\tsete	%%al\n");
   fprintf(object, "\tmovzbl	%%al, %%eax\n");
   fprintf(object, "\tmovl	%%eax, -4(%%rbp)\n");
   fprintf(object, "\tmovl	-4(%%rbp), %%eax\n");
-  fprintf(object, "\tmovl	%%eax, %%esi\n");
+  //fprintf(object, "\tmovl	%%eax, %%esi\n");
   return 0;
 }
 
-int negint(int VAR)
+int negint(void)
 {
-return neglog(VAR);
+//neglog(void);
+return 0;
 }
 
-int negflt(float VAR)
+int negflt(void)
 {
   /*
-  Assembly of negflt.c
+  Assembly de negflt.c
   pushq	%%rbp
   movq	%%rsp, %%rbp
   subq	$16, %%rsp
@@ -151,10 +154,10 @@ int negflt(float VAR)
   return 0;
 }
 
-int negdbl(double VAR)
+int negdbl(void)
 {
   /*
-  Assembly of negdbl.c
+  Assembly de negdbl.c
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -193,33 +196,33 @@ int negdbl(double VAR)
   */
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -16(%%rbp)\n");
   fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
   fprintf(object, "\tucomisd	-16(%%rbp), %%xmm0\n");
-  labelcounter++;
-  labelcounter++;
-  fprintf(object, "\tjp	.L%d\n",labelcounter);
+  /*labelcounter++;*/
+  /*labelcounter++;*/
+  fprintf(object, "\tjp	.L(LABELNUMBER)\n"/*,labelcounter*/);
   fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
   fprintf(object, "\tucomisd	-16(%%rbp), %%xmm0\n");
-  fprintf(object, "\tjne	.L%d\n",labelcounter);
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
-  labelcounter++;
-  labelcounter++;
-  fprintf(object, "\tjmp	.L%d\n",labelcounter);
-  fprintf(object, ".L%d:\n",labelcounter-2);
+  fprintf(object, "\tjne	.L(LABELNUMBER)\n"/*,labelcounter*/);
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
+  /*labelcounter++;*/
+  /*labelcounter++;*/
+  fprintf(object, "\tjmp	.L(LABELNUMBER)\n"/*,labelcounter*/);
+  fprintf(object, ".L(LABELNUMBER):\n"/*,labelcounter-2*/);
   fprintf(object, "\tpxor	%%xmm0, %%xmm0\n");
-  fprintf(object, ".L%d:\n",labelcounter);
+  fprintf(object, ".L(LABELNUMBER):\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -8(%%rbp)\n");
   fprintf(object, "\tmovl	$0, %%eax\n");
   fprintf(object, "\tpopq	%%rbp\n");
   fprintf(object, "\t.align 8\n");
-  fprintf(object, ".LC%d:\n",labelcounter-4);
+  fprintf(object, ".LC(LABELNUMBER):\n"/*,labelcounter-4*/);
   fprintf(object, "\t.long	605830907\n");
   fprintf(object, "\t.long	1072822596\n");
   fprintf(object, "\t.align 8\n");
-  fprintf(object, "LC%d:\n",labelcounter-2);
+  fprintf(object, "LC(LABELNUMBER):\n"/*,labelcounter-2*/);
   fprintf(object, "\t.long	0\n");
   fprintf(object, "\t.long	1072693248\n");
   return 0;
@@ -227,10 +230,10 @@ int negdbl(double VAR)
 
 /*binary addition and inversion*/
 
-int addlog(int VAR1,int VAR2)
+int addlog(void)
 {
 /*
-Partial assembly of a C code... Simple operation: c = 1 OR 0;
+Assembly parcial de um codigo c,de uma simples operacao c = 1 OR 0;
 pushq	%%rbp
 .cfi_def_cfa_offset 16
 .cfi_offset 6, -16
@@ -258,28 +261,28 @@ movl	$0, %eax
 fprintf(object, "\tpushq	%%rbp\n");
 fprintf(object, "\tmovq	%%rsp, %%rbp\n");
 fprintf(object, "\tsubq	$16, %%rsp\n");
-fprintf(object, "\tmovl	$%d, -12(%%rbp)\n",VAR1);
-fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR2);
+fprintf(object, "\tmovl	$VAR1, -12(%%rbp)\n");
+fprintf(object, "\tmovl	$VAR2, -8(%%rbp)\n");
 fprintf(object, "\tcmpl	$0, -12(%%rbp)\n");
-labelcounter++;
-fprintf(object, "\tjne	.L%d\n",labelcounter);
+/*labelcounter++;*/
+fprintf(object, "\tjne	.L(LABELNUMBER)\n"/*abelcounter*/);
 fprintf(object, "\tcmpl	$0, -8(%%rbp)\n");
-fprintf(object, "\tje	.L%d\n",labelcounter);
-fprintf(object, ".L%d:\n",labelcounter);
+fprintf(object, "\tje	.L(LABELNUMBER)\n"/*,labelcounter*/);
+fprintf(object, ".L(LABELNUMBER):\n"/*,labelcounter*/);
 fprintf(object, "\tmovl	$1, %%eax\n");
-labelcounter++;
-fprintf(object, "\tjmp	.L%d\n",labelcounter + 1);
-fprintf(object, ".L%d:\n",labelcounter);
+/*labelcounter++;*/
+fprintf(object, "\tjmp	.L(LABELNUMBER)\n"/*,labelcounter + 1*/);
+fprintf(object, ".L(LABELNUMBER):\n"/*,labelcounter*/);
 fprintf(object, "\tmovl	$0, %%eax\n");
-labelcounter++;
-fprintf(object, ".L%d:\n",labelcounter);
+/*labelcounter++;*/
+fprintf(object, ".L(LABELNUMBER):\n"/*,labelcounter*/);
 fprintf(object, "\tmovl	%%eax, -4(%%rbp)\n");
 fprintf(object, "\tmovl	-4(%%rbp), %%eax\n");
 fprintf(object, "\tmovl	%%eax, %%esi\n");
 return 0;
 }
 
-int addint(int VAR1,int VAR2)
+int addint(void)
 {
 /*
   addl %eax, (%rsp)
@@ -290,24 +293,15 @@ int addint(int VAR1,int VAR2)
  return 0;
 }
 
-int addflt(float VAR1, float VAR2)
+int addflt(void)
 {
-/*
-  movss (%esp), %xmm1
-  movss %eax, %xmm0
-  addss xmm1, %xmm0
-  movss %xmm0, x(%rip)
-  addl $4, %esp
-*/
-  fprintf(object, "\tmovss (%%esp), %%xmm1\n");
-  fprintf(object, "\tmovss %%eax, %%xmm0\n");
   fprintf(object, "\taddss %%xmm1, %%xmm0\n");
   fprintf(object, "\tmovss %%xmm0, x(%%rip)\n");
   fprintf(object, "\taddl $4, %%esp\n");
   return 0;
 }
 
-int adddbl(double VAR1, double VAR2)
+int adddbl(void)
 {
 /*
   movsd   xx(%rsp), %xmm1
@@ -316,18 +310,16 @@ int adddbl(double VAR1, double VAR2)
   movsd   %xmm0, %rax
   addq    $8, %rsp
 */
-  fprintf(object, "\tmovsd xx(%%rsp), %%xmm1\n");
-  fprintf(object, "\tmovsd %%rax, %%xmm0\n");
   fprintf(object, "\taddsd %%xmm1, %%xmm0\n");
   fprintf(object, "\tmovsd %%xmm0, %%rax\n");
   fprintf(object, "\taddq $8, %%rsp\n");
   return 0;
 }
 
-int subint(int VAR1,int VAR2)
+int subint(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 25 - 7;
+  Assembly parcial de um codigo c,de uma simples operacao c = 25 - 7;
   pushq	%rbp
   .cfi_def_cfa_offset 16
   .cfi_offset 6, -16
@@ -347,22 +339,22 @@ int subint(int VAR1,int VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$16, %%rsp\n");
-  fprintf(object, "\tmovl	$%d, -12(%%rbp)\n",VAR1);
-  fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR2);
+  fprintf(object, "\tmovl	$VAR1, -12(%%rbp)\n");
+  fprintf(object, "\tmovl	$VAR2, -8(%%rbp)\n");
   fprintf(object, "\tmovl	-12(%%rbp), %%eax\n");
   fprintf(object, "\tsubl	-8(%%rbp), %%eax\n");
   fprintf(object, "\tmovl	%%eax, -4(%%rbp)\n");
   fprintf(object, "\tmovl	-4(%%rbp), %%eax\n");
   fprintf(object, "\tmovl	%%eax, %%esi\n");
-  fprintf(object, "\tmovl	$.LC0, %%edi\n");
+  fprintf(object, "\tmovl	$.LC(LABELNUMBER), %%edi\n");
   fprintf(object, "\tmovl	$0, %%eax\n");
   return 0;
 }
 
-int subflt(float VAR1,float VAR2)
+int subflt(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 10.20 - 2.34;
+  Assembly parcial de um codigo c,de uma simples operacao c = 10.20 - 2.34
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -388,31 +380,31 @@ int subflt(float VAR1,float VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$16, %%rsp\n");
-  labelcounter++;
-  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovss	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovss	%%xmm0, -12(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovss	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovss	%%xmm0, -8(%%rbp)\n");
   fprintf(object, "\tmovss	-12(%%rbp), %%xmm0\n");
   fprintf(object, "\tsubss	-8(%%rbp), %%xmm0\n");
   fprintf(object, "\tmovss	%%xmm0, -4(%%rbp)\n");
   fprintf(object, "\tcvtss2sd	-4(%%rbp), %%xmm0\n");
   fprintf(object, "\t.align 4\n");
-  fprintf(object, ".LC%d\n",labelcounter - 1);
+  fprintf(object, ".LC(LABELNUMBER)\n"/*,labelcounter - 1*/);
   //nao eh pra ler var como float, eh pra ler como long REMOVER ESSE COMENTARIO DEPOIS
-  fprintf(object, "\t.long	$%f",VAR1);
+  fprintf(object, "\t.long	$VAR1");
   fprintf(object, "\t.align 4\n");
-  fprintf(object, ".LC%d\n",labelcounter);
+  fprintf(object, ".LC(LABELNUMBER)\n"/*,labelcounter*/);
   //nao eh pra ler var como float, eh pra ler como long REMOVER ESSE COMENTARIO DEPOIS
-  fprintf(object, "\t.long	$%f",VAR2);
+  fprintf(object, "\t.long	$VAR2");
   return 0;
 }
 
-int subdbl(double VAR1,double VAR2)
+int subdbl(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 10.20 - 2.34, being sent double variables;
+  Assembly parcial de um codigo c,de uma simples operacao c = 10.20 - 2.34,sendo as variaveis envolvidas double
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -443,11 +435,11 @@ int subdbl(double VAR1,double VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$48, %%rsp\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -24(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -16(%%rbp)\n");
   fprintf(object, "\tmovsd	-24(%%rbp), %%xmm0\n");
   fprintf(object, "\tsubsd	-16(%%rbp), %%xmm0\n");
@@ -456,22 +448,22 @@ int subdbl(double VAR1,double VAR2)
   fprintf(object, "\tmovq	-8(%%rbp), %%rax\n");
   fprintf(object, "\tmovq	%%rax, -40(%%rbp)\n");
   fprintf(object, "\tmovsd	-40(%%rbp), %%xmm0\n");
-  fprintf(object, ".LC%d:\n",labelcounter-1);
-  fprintf(object, "\t.long	VAR1_parteAlta\n"/*VAR1 high part*/);
-  fprintf(object, "\t.long	VAR1_parteBaixa\n"/*VAR1 low part*/);
+  fprintf(object, ".LC(LABELNUMBER):\n"/*,labelcounter-1*/);
+  fprintf(object, "\t.long	VAR1_parteAlta\n"/*VAR1 parte alta*/);
+  fprintf(object, "\t.long	VAR1_parteBaixa\n"/*VAR1 parte baixa*/);
   fprintf(object, "\t.align 8\n");
-  fprintf(object, ".LC%d:\n",labelcounter);
-  fprintf(object, "\t.long	VAR2_parteAlta\n"/*,VAR2 high part*/);
-  fprintf(object, "\t.long	VAR2_parteBaixa\n"/*,VAR2 low part*/);
+  fprintf(object, ".LC(LABELNUMBER):\n"/*,labelcounter*/);
+  fprintf(object, "\t.long	VAR2_parteAlta\n"/*,VAR2 parte alta*/);
+  fprintf(object, "\t.long	VAR2_parteBaixa\n"/*,VAR2 parte baixa*/);
   return 0;
 }
 
 /*binary multiplication and inverse*/
 
-int mullog(int VAR1,int VAR2)
+int mullog(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 1 && 0;
+  Assembly parcial de um codigo c,de uma simples operacao c = 1 && 0;
   movl	$1, -12(%rbp)
   movl	$0, -8(%rbp)
   cmpl	$0, -12(%rbp)
@@ -489,29 +481,29 @@ int mullog(int VAR1,int VAR2)
   movl	$.LC0, %edi
   movl	$0, %eax
   */
-  fprintf(object, "\tmovl $%d, -12(%%rbp)\n",VAR1);
-  fprintf(object, "\tmovl $%d, -8(%%rbp)\n",VAR2);
+  fprintf(object, "\tmovl $VAR1, -12(%%rbp)\n");
+  fprintf(object, "\tmovl $VAR2, -8(%%rbp)\n");
   fprintf(object, "\tcmpl	$0, -12(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tje	.L%d\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tje	.L(LABELNUMBER)\n"/*,labelcounter*/);
   fprintf(object, "\tcmpl	$0, -8(%%rbp)\n");
-  fprintf(object, "\tje	.L%d\n",labelcounter);
+  fprintf(object, "\tje	.L(LABELNUMBER)\n"/*,labelcounter*/);
   fprintf(object, "\tmovl	$1, %%eax\n");
-  labelcounter++;
-  fprintf(object, "\tjmp	.L%d\n",labelcounter);
-  fprintf(object, ".L%d\n",labelcounter - 1);
+  /*labelcounter++;*/
+  fprintf(object, "\tjmp	.L(LABELNUMBER)\n"/*,labelcounter*/);
+  fprintf(object, ".L(LABELNUMBER)\n"/*,labelcounter - 1*/);
   fprintf(object, "\tmovl	$0, %%eax\n");
-  fprintf(object, ".L%d\n",labelcounter);
+  fprintf(object, ".L(LABELNUMBER)\n"/*,labelcounter*/);
   fprintf(object, "\tmovl	%%eax, -4(%%rbp)\n");
   fprintf(object, "\tmovl	-4(%%rbp), %%eax\n");
   fprintf(object, "\tmovl	%%eax, %%esi\n");
   return 0;
 }
 
-int mulint(int VAR1,int VAR2)
+int mulint(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 7 * 8;
+  Assembly parcial de um codigo c,de uma simples operacao c = 7 * 8;
   pushq	%rbp
 	.cfi_def_cfa_offset 16
 	.cfi_offset 6, -16
@@ -531,8 +523,8 @@ int mulint(int VAR1,int VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$16, %%rsp\n");
-  fprintf(object, "\tmovl	$%d, -12(%%rbp)\n",VAR1);
-  fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR2);
+  fprintf(object, "\tmovl	$var, -12(%%rbp)\n");
+  fprintf(object, "\tmovl	$var, -8(%%rbp)\n");
   fprintf(object, "\tmovl	-12(%%rbp), %%eax\n");
   fprintf(object, "\timull	-8(%%rbp), %%eax\n");
   fprintf(object, "\tmovl	%%eax, -4(%%rbp)\n");
@@ -541,10 +533,10 @@ int mulint(int VAR1,int VAR2)
   return 0;
 }
 
-int mulflt(float VAR1,float VAR2)
+int mulflt(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 7 * 8; being both 7 and 8 double.
+  Assembly parcial de um codigo c,de uma simples operacao c = 7 * 8, sendo 7 e 8 double
   pushq	%rbp
   movq	%rsp, %rbp
   subq	$16, %rsp
@@ -568,33 +560,33 @@ int mulflt(float VAR1,float VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$16, %%rsp\n");
-  labelcounter++;
-  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovss	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovss	%%xmm0, -12(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovss	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovss	%%xmm0, -8(%%rbp)\n");
   fprintf(object, "\tmovss	-12(%%rbp), %%xmm0\n");
   fprintf(object, "\tmulss	-8(%%rbp), %%xmm0\n");
   fprintf(object, "\tmovss	%%xmm0, -4(%%rbp)\n");
   fprintf(object, "\tcvtss2sd	-4(%%rbp), %%xmm0\n");
-  labelcounter++;
-  fprintf(object, "\tmmovl	$.LC%d, %%edi\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmmovl	$.LC(labelcounter) %%edi\n"/*,labelcounter*/);
   fprintf(object, "\tmovl	$1, %%eax\n");
   fprintf(object, "\t.align 4\n");
-  fprintf(object, "LC%d:\n",labelcounter-3);
+  fprintf(object, "LC(labelcounter):\n"/*,labelcounter-3*/);
   //encaixar VAR1 e 2 \/
   fprintf(object, "\t.long	VAR1\n");
   fprintf(object, "\t.align 4n");
-  fprintf(object, "LC%d:\n",labelcounter-2);
+  fprintf(object, "LC(LABELNUMBER):\n"/*,labelcounter-2*/);
   fprintf(object, "\t.long	VAR2\n");
   return 0;
 }
 
-int muldbl(double VAR1,double VAR2)
+int muldbl(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 7.31 * 8,91; being both 7 and 8 double.
+  Assembly parcial de um codigo c,de uma simples operacao c = 7.31 * 8,91, sendo 7 e 8 double
   pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$48, %rsp
@@ -620,11 +612,11 @@ int muldbl(double VAR1,double VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$48, %%rsp\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -24(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(labelcounter)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -16(%%rbp)\n");
   fprintf(object, "\tmovsd	-24(%%rbp), %%xmm0\n");
   fprintf(object, "\tmulsd	-16(%%rbp), %%xmm0\n");
@@ -633,20 +625,20 @@ int muldbl(double VAR1,double VAR2)
   fprintf(object, "\tmovq	%%rax, -40(%%rbp)\n");
   fprintf(object, "\tmovsd	-40(%%rbp), %%xmm0\n");
   fprintf(object, "\t.align 8\n");
-  fprintf(object, "LC%d:\n",labelcounter-1);
+  fprintf(object, "LC(LABELNUMBER):\n"/*,labelcounter-1*/);
   fprintf(object, "\t.long	VAR1_parteAlta\n");
   fprintf(object, "\t.long	VAR1_parteBaixa\n");
   fprintf(object, "\t.align 8\n");
-  fprintf(object, "LC%d:\n",labelcounter);
+  fprintf(object, "LC(LABELNUMBER):\n"/*,labelcounter*/);
   fprintf(object, "\t.long	VAR2_parteAlta\n");
   fprintf(object, "\t.long	VAR2_parteBaixa\n");
   return 0;
 }
 
-int divint(int VAR1,int VAR2)
+int divint(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: c = 4 / 2; being both 4 and 2 int.
+  Assembly parcial de um codigo c,de uma simples operacao c = 4 / 2, sendo 4 e 2 int
   pushq	%rbp
   .cfi_def_cfa_offset 16
   .cfi_offset 6, -16
@@ -665,8 +657,8 @@ int divint(int VAR1,int VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$16, %%rsp\n");
-  fprintf(object, "\tmovl	$%d, -12(%%rbp)\n",VAR1);
-  fprintf(object, "\tmovl	$%d, -8(%%rbp)\n",VAR2);
+  fprintf(object, "\tmovl	$var, -12(%%rbp)\n");
+  fprintf(object, "\tmovl	$var, -8(%%rbp)\n");
   fprintf(object, "\tmovl	-12(%%rbp), %%eax\n");
   fprintf(object, "\tcltd\n");
   fprintf(object, "\tidivl	-8(%%rbp)\n");
@@ -676,10 +668,10 @@ int divint(int VAR1,int VAR2)
   return 0;
 }
 
-int divflt(float VAR1,float VAR2)
+int divflt(void)
 {
   /*
-  Partial assembly of a C code... Simple operation: a = 15.321 e b = 2.1; c = a / b;
+  Assembly parcial de um codigo c,de uma simples operacao a = 15.321 e b = 2.1; c = a / b;
   pushq	%rbp
 	movq	%rsp, %rbp
 	subq	$16, %rsp
@@ -702,26 +694,26 @@ int divflt(float VAR1,float VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$16, %%rsp\n");
-  labelcounter++;
-  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovss	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovss	%%xmm0, -12(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tmovss	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;**/
+  fprintf(object, "\tmovss	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovss	%%xmm0, -8(%%rbp)\n");
   fprintf(object, "\tmovss	-12(%%rbp), %%xmm0\n");
   fprintf(object, "\tdivss	-8(%%rbp), %%xmm0\n");
   fprintf(object, "\tmovss	%%xmm0, -4(%%rbp)\n");
   fprintf(object, "\tcvtss2sd	-4(%%rbp), %%xmm0\n");
   fprintf(object, "\t.align 4\n");
-  fprintf(object, "\t.LC%d\n",labelcounter-1);
+  fprintf(object, "\t.LC(LABELNUMBER)\n"/*,labelcounter-1*/);
   fprintf(object, "\t.long	VAR1\n");
   fprintf(object, "\t.align 4\n");
-  fprintf(object, "\t.LC%d\n",labelcounter);
+  fprintf(object, "\t.LC(LABELNUMBER)\n"/*,labelcounter*/);
   fprintf(object, "\t.long	VAR1\n");
   return 0;
 }
 
-int divdbl(double VAR1,double VAR2)
+int divdbl(void)
 {
 
   /*
@@ -751,11 +743,11 @@ int divdbl(double VAR1,double VAR2)
   fprintf(object, "\tpushq	%%rbp\n");
   fprintf(object, "\tmovq	%%rsp, %%rbp\n");
   fprintf(object, "\tsubq	$48, %%rsp\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -24(%%rbp)\n");
-  labelcounter++;
-  fprintf(object, "\tmovsd	.LC%d(%%rip), %%xmm0\n",labelcounter);
+  /*labelcounter++;*/
+  fprintf(object, "\tmovsd	.LC(LABELNUMBER)(%%rip), %%xmm0\n"/*,labelcounter*/);
   fprintf(object, "\tmovsd	%%xmm0, -16(%%rbp)\n");
   fprintf(object, "\tmovsd	-24(%%rbp), %%xmm0\n");
   fprintf(object, "\tdivsd	-16(%%rbp), %%xmm0\n");
