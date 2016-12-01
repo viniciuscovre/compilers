@@ -103,7 +103,7 @@ int iscmdsep(void)
 // mypas -> prgbody '.'
 void mypas(void)
 {
-  lookahead = gettoken (source_code);
+  lookahead = gettoken (source);
   body();
   match('.');
 }
@@ -514,7 +514,7 @@ int expr(int inherited_type)
           match(ASGN);
           //verify if rtype changes symbol type...
 	        /*[[*/ rtype = /*]]*/ superexpr(/*[[*/ltype/*]]*/);
-	  
+
       	  /*[[*/
       	  if(iscompatible(ltype, rtype)) {
       	    acctype = max(rtype,acctype);
@@ -529,9 +529,9 @@ int expr(int inherited_type)
 	  {
 	    var_name[c]=symtab_stream[c];
 	    c++;
-	  }  
+	  }
 	  lmovel(var_name); $$$ */
-	  
+
 	      } /*[[*/ else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
@@ -609,7 +609,7 @@ int addop (void)
   {
     case '+':
       match('+');
-      
+
       /* $$$ if(flag_int)
       {*/
       addint();
@@ -619,7 +619,7 @@ int addop (void)
       {
       adddbl();
       printf("PASSOU AQUI DBL\n");
-      }	 $$$ */ 
+      }	 $$$ */
       return '+';
 
     case '-':
@@ -730,7 +730,7 @@ int lookahead; /** @ parser **/
 void match (int expected_token)
 {
   if (expected_token == lookahead) {
-    lookahead = gettoken (source_code);
+    lookahead = gettoken (source);
   } else {
     fprintf (stderr, "\nparser: token mismatch error.\n");
     fprintf (stderr, "expecting %d but seen %d. Exting...\n",

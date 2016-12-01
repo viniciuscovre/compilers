@@ -88,6 +88,6 @@ extern int gettoken (FILE *); /** @ lexer.c **/
 
 void match (int expected_token);
 
-extern FILE *source_code;
+extern FILE *source;
 
 extern char lexeme[]; /** @ lexer.c **/
