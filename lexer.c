@@ -1,5 +1,3 @@
-/**@<lexer.c>::**/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -16,8 +14,9 @@ void skipspaces (FILE *tape)
   ungetc ( cake, tape );
 }
 
-char lexeme[MAXID_SIZE+1];//@ lexer.c
+char lexeme[MAXID_SIZE+1];
 
+// ASGN = :=
 int is_assign(FILE * tape){
 
   if((lexeme[0] = getc(tape)) == ':'){
@@ -61,7 +60,6 @@ int is_decimal(FILE *tape)
   if (isdigit (lexeme[i] = getc(tape))) {
     if (lexeme[i] == '0') {
       if( (lexeme[++i] = getc(tape)) == '0' || lexeme[i] == EOF || lexeme[i] == EOL ) {
-        // ungetc (lexeme[i], tape);
         return INTCONST;
       } else if (lexeme[i] == '.' || tolower(lexeme[i]) == 'e') {
         //for later float verification

@@ -1,4 +1,3 @@
-/**@<mypas.c>::**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <tokens.h>
@@ -15,7 +14,7 @@ int main (int argc, char *argv[], char *envp[])
     fprintf(stderr, "%s: cannot compile without an input file... exiting\n", argv[0]);
     exit (FILE_NOT_FOUND);
   } else if (argc == 2 || argc == 3) {
-    
+
     char *extension;
     //getting extension (dividing argv[1] by '.'). Right one should be '.pas'
     extension = strchr(argv[1], '.');

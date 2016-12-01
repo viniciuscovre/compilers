@@ -35,7 +35,7 @@
 */
 
 /* system include */
-#include <malloc.h> 
+// #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,18 +53,6 @@
 int ERROR_COUNTER = 0; // semantic errors counter
 
 char **namelist(void);
-/*
-* cmdsep -> ';' | '\n'
-*/
-int iscmdsep(void)
-{
-  switch(lookahead){
-    case ';': case '\n':
-    match(lookahead);
-    return 1;
-  }
-  return 0;
-}
 
 /* function to increment semantic error counter (ERROR_COUNTER) and print
 error number in error file (via fprintf) */
@@ -137,54 +125,13 @@ void declarative(void)
       /*[[*/
       for(i=0; namev[i]; i++) {
         if(symtab_append(namev[i], type) == -2)
-          fprintf(stderr,"%d: FATAL ERROR: -2 no more space in symtab", semanticErrorNum());
+          fprintf(stderr,"%d: FATAL ERROR -2: no more space in symtab", semanticErrorNum());
       }
       /*]]*/
       match(';');
     } while(lookahead == ID);
 
   }
-}
-
-// fnctype -> INTEGER | REAL | BOOLEAN
-void fnctype(void)
-{
-  switch(lookahead) {
-    case INTEGER:
-      match(INTEGER);
-      break;
-
-    case REAL:
-      match(REAL);
-      break;
-
-    default:
-      match(BOOLEAN);
-  }
-
-}
-
-// parmdef -> [ '(' [VAR] namelist ':' { ';' [VAR] namelist ':' vartype } ')' ]
-void parmdef(void)
-{
-  if(lookahead == '(') {
-    match('(');
-    if(lookahead == VAR){
-      match(VAR);
-    }
-    namelist();
-    match(':');
-    while(lookahead == ';') {
-      match(';');
-      if(lookahead == VAR) {
-        match(VAR);
-      }
-      namelist();
-      match(':');
-      vartype();
-    }
-  }
-  match(')');
 }
 
 //namelist -> ID { , ID }
@@ -301,23 +248,20 @@ void beginblock(void)
 void ifstmt(void)
 {
   /*[[*/int _endif, _else;/*]]*/
-  // int syntype;
   match(IF);
   expr(BOOLEAN);
   // syntype = expr(BOOLEAN); //-> <expr>asm
-  /**//**/
-  fprintf(object, "\tjz .L%d\n", _endif = _else = labelcounter++);
-  //TODO: verif se o tipo sintetizado é compatível com o tipo herdado
+  /*[[*/fprintf(object, "\tjz .L%d\n", _endif = _else = labelcounter++);/*]]*/
   match(THEN);
   stmt();
   if(lookahead == ELSE) {
     match(ELSE);
-    _endif = jump(labelcounter++); //[before] --> _endif = labelcounter++;
-    mklabel(_else);
-    mklabel(_endif);
+    /*[[*/_endif = jump(labelcounter++);/*]]*/
+    /*[[*/mklabel(_else);/*]]*/
+    /*[[*/mklabel(_endif);/*]]*/
     stmt();
   }
-  mklabel(_endif);
+  /*[[*/mklabel(_endif);/*]]*/
 
 }
 
@@ -325,20 +269,13 @@ void ifstmt(void)
 void whilestmt(void)
 {
   /*[[*/int while_head, while_tail/*]]*/;
-
   match(WHILE);
-
   /*[[*/mklabel(while_head = labelcounter++)/*]]*/;
-
   expr(BOOLEAN);
-
   /*[[*/gofalse(while_tail = labelcounter++)/*]]*/;
-
   match(DO);
   stmt();
-
   /*[[*/jump(while_head)/*]]*/;
-
   /*[[*/mklabel(while_tail)/*]]*/;
 
 }
@@ -366,7 +303,7 @@ void repeatstmt(void)
  *  NOT     |     X       |     N/A
  *  OR      |     X       |     N/A
  *  AND     |     X       |     N/A
- *  NEG     |    N/A      |      X     // mudança de sinal
+ *  NEG     |    N/A      |      X     // signal changes
  *  '+''-'  |    N/A      |      X
  *  '*''/'  |    N/A      |      X
  *  DIV     |    N/A      |   INTEGER
@@ -390,34 +327,34 @@ void repeatstmt(void)
  *
  */
 
-int iscompatible(int ltype, int rtype)
-{
-  switch(ltype) {
+ int iscompatible(int ltype, int rtype)
+ {
+   switch(ltype) {
 
-    case BOOLEAN:
-    case INTEGER:
-      if(rtype == ltype)
-        return ltype;
-      break;
+     case BOOLEAN:
+     case INTEGER:
+       if(rtype == ltype)
+         return ltype;
+       break;
 
-    case REAL:
-      switch(rtype) {
-	       case INTEGER:
+     case REAL:
+       switch(rtype) {
+         case INTEGER:
          case REAL:
-          return ltype;
-      }
-      break;
+         return ltype;
+       }
+       break;
 
-    case DOUBLE:
-      switch(rtype) {
-	       case INTEGER:
+     case DOUBLE:
+       switch(rtype) {
+         case INTEGER:
          case REAL:
          case DOUBLE:
-      return ltype;
-      }
-  }
-  return 0;
-}
+           return ltype;
+       }
+   }
+   return 0;
+ }
 
 int isrelop(void)
 {
@@ -528,9 +465,7 @@ int smpexpr(int inherited_type)
 	      } /*[[*/ else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
-        } /*else {
-	        syntype = symtab[varlocality][1];
-	      }*/
+        }
         /*]]*/
         break;
 
@@ -538,20 +473,20 @@ int smpexpr(int inherited_type)
         {
           float lexval = atof(lexeme);
           char *fltIEEE = malloc(sizeof(lexeme) + 1);
-          sprintf(fltIEEE, "$%i", *((int *)&lexval) );
-          rmovel(fltIEEE);
+          /*[[*/sprintf(fltIEEE, "$%i", *((int *)&lexval) );/*]]*/
+          /*[[*/rmovel(fltIEEE);/*]]*/
         }
         match(FLTCONST);
         break;
 
       case INTCONST:
-	rmovel((char*)lexeme);
+	     /*[[*/rmovel((char*)lexeme);/*]]*/
         match(INTCONST);
         break;
 
       default:
         match('(');
-	/*[[*/syntype = /*]]*/ expr(0);
+	      /*[[*/syntype = /*]]*/ expr(0);
 
 	      /*[[*/
 	      if(iscompatible(syntype, acctype)) {
@@ -597,17 +532,17 @@ int addop (void)
   {
     case '+':
       match('+');
-      addint();
+      /*[[*/addint();/*]]*/
       return '+';
 
     case '-':
       match('-');
-      subint();
+      /*[[*/subint();/*]]*/
       return '-';
 
     case OR:
       match(OR);
-      mullog();
+      /*[[*/mullog();/*]]*/
       return OR;
   }
   return 0;
@@ -620,56 +555,25 @@ int mulop (void)
   {
     case '*':
       match('*');
-      mulint();
+      /*[[*/mulint();/*]]*/
       return '*';
 
     case '/':
       match('/');
-      divint();
+      /*[[*/divint();/*]]*/
       return '/';
 
     case AND:
       match(AND);
-      addlog();
+      /*[[*/addlog();/*]]*/
       return AND;
   }
   return 0;
 }
 
-/* arithmetic_op -> > | < */
-int arithmetic_op (void)
-{
-  switch (lookahead)
-  {
-    case '>':
-    match('>'); return '>';
-    case '<':
-    match('<'); return '<';
-  }
-  return 0;
-}
-
-/* variable -> [[ print ID ]] ID */
-void variable (void)
-{
-  /* symbol must be declared */
-  if(symtab_lookup(lexeme) == -1) {
-    fprintf(stderr,"%d: FATAL ERROR: symbol not find #:%d", semanticErrorNum(), -1);
-    return;
-  }
-
-  /*[[*/char varname[MAXID_SIZE]/*]]*/;
-  /*[[*/strcpy(varname, lexeme)/*]]*/;
-  match(ID);
-  if (lookahead == ASGN) {// L-VALUE:
-    match(ASGN); // ASGN = ':='
-    smpexpr(INTCONST);
-  }
-}
-
 /******************************* lexer-to-parser interface *****************************************/
 
-int lookahead; /** @ parser **/
+int lookahead;
 
 void match (int expected_token)
 {

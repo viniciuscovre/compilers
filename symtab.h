@@ -1,5 +1,3 @@
-/**@<symtab.h>::**/
-
 #define MAX_SYMTAB_ENTRIES  32
 
 extern int symtab[MAX_SYMTAB_ENTRIES][2];

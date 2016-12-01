@@ -1,4 +1,3 @@
-/**@<mypas.h>::**/
 #include <stdio.h>
 
 FILE *source, *object;

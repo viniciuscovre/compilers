@@ -44,31 +44,19 @@
 int smpexpr(int inherited_type);
 int expr(int inherited_type);
 /* term -> fact quoc */
-void term (void);
 /* rest -> addop term rest | <> */
-void rest (void);
 /* quoc -> mulop fact quoc | <> */
-void quoc(void);
 /* fact -> variable | constant | ( smpexpr ) */
-void fact (void);
 /* addop -> + | - */
 int addop (void);
 /* mulop -> * | / */
 int mulop (void);
 /* constant -> DEC | OCT | HEX | FLT */
-void constant (void);
 /* variable -> ID */
-void variable (void);
-
-void arith (void);
-
-int arithmetic_op (void);
 
 void mypas(void);
 void body(void);
 void declarative(void);
-void fnctype(void);
-void parmdef(void);
 int vartype(void);
 void imperative(void);
 void stmtlist(void);
@@ -77,8 +65,6 @@ void beginblock(void);
 void ifstmt(void);
 void whilestmt(void);
 void repeatstmt(void);
-/*int octalToInt(char octalToConvert[]);
-int hexToInt(char hexToConvert[]);*/
 
 /******************************* lexer-to-parser interface *****************************************/
 

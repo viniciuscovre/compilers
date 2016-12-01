@@ -1,4 +1,3 @@
-/**@<pseudoassembly.c>::**/
 #include <pseudoassembly.h>
 
 /*unified label counter*/

@@ -1,5 +1,3 @@
-/**@<tokens.h>::**/
-
 enum {
 	ID = 1025,
 	INTCONST,

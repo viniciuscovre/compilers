@@ -1,4 +1,3 @@
-/**@<symtab.c>::**/
 #include <string.h>
 #include <parser.h>
 #include <lexer.h>
@@ -50,7 +49,7 @@ int symtab_append(char const *name, int type)
 void print_symtab_stream(void)
 {
   int a,b,fim,ini;
-  for (a=0;a<symtab_nextentry;a++)  
+  for (a=0;a<symtab_nextentry;a++)
   {
     //find where some variable starts in stream
     b = symtab[a][0];
