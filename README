@@ -10,9 +10,6 @@ VAR1_parteAlta/baixa,e mais uns)
 
 - encaixar as chamadas de funcoes do pseudoassembly!!!
 
-- criar contador de erros para erros semânticos (que devem ser listados ao fim
-da compilação), não para erros sintáticos, pois eles são fatais
-
 - no fim da compilação, deve-se apenas exibir uma lista com erros semânticos OU
 o erro sintático q força o exit
 

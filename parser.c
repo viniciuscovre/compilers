@@ -50,7 +50,7 @@
 #include <pseudoassembly.h>
 #include <parser.h>
 
-
+int ERROR_COUNTER = 0; // semantic errors counter
 int flag_int = 0;
 int flag_dbl = 0;
 
@@ -68,6 +68,13 @@ int iscmdsep(void)
   return 0;
 }
 
+/* function to increment semantic error counter (ERROR_COUNTER) and print
+error number in error file (via fprintf) */
+int semanticErrorNum()
+{
+  ERROR_COUNTER++;
+  return ERROR_COUNTER;
+}
 
 /*
 *
@@ -132,9 +139,9 @@ void declarative(void)
       /*[[*/
       for(i=0; namev[i]; i++) {
         if(symtab_append(namev[i], type) == -2)
-          fprintf(stderr,"FATAL ERROR: -2 no more space in symtab");
+          fprintf(stderr,"%d: FATAL ERROR: -2 no more space in symtab", semanticErrorNum());
         else if (symtab_append(namev[i], type) == -3)
-	{}// $$$ fprintf(stderr,"FATAL ERROR: -3,%s name does not exist in symtab",namev[i]);
+	{}// $$$ fprintf(stderr,"%d: FATAL ERROR: -3,%s name does not exist in symtab", semanticErrorNum(), namev[i]);
       }
       /*]]*/
       match(';');
@@ -454,7 +461,7 @@ int superexpr(int inherited_type)
   if(isrelop()) { // verifies only when it comes a relational operator
     t2 = expr(t1);
     if(iscompatible(t1,t2)) {
-       fprintf(stderr, "incompatible operation %d with %d: fatal error.\n",t1,t2);
+       fprintf(stderr, "%d: incompatible operation %d with %d: fatal error.\n",semanticErrorNum(),t1,t2);
     }
   }
   return min(BOOLEAN, t2);
@@ -474,7 +481,7 @@ int expr(int inherited_type)
     match('-');
     /*[[*/
     if(acctype == BOOLEAN) { // "minus" isn't compatible with boolean operation
-      fprintf(stderr, "incompatible unary operator: fatal error.\n");
+      fprintf(stderr, "%d: incompatible unary operator: fatal error.\n",semanticErrorNum());
     } else if (acctype == 0) {
       acctype = INTEGER;
     }
@@ -483,7 +490,7 @@ int expr(int inherited_type)
     match(NOT);
     /*[[*/
     if(acctype > BOOLEAN) { // "not" isn't compatible with non-boolean operation
-      fprintf(stderr, "incompatible unary operator: fatal error.\n");
+      fprintf(stderr, "%d: incompatible unary operator: fatal error.\n", semanticErrorNum());
     }
     acctype = BOOLEAN;
     /*]]*/
@@ -498,7 +505,7 @@ int expr(int inherited_type)
         varlocality = symtab_lookup(lexeme);
 	printf("lexeme:%s\n",lexeme);
         if(varlocality < 0) {
-          fprintf(stderr, "parser: %s not declared... fatal error!\n", lexeme);
+          fprintf(stderr, "%d: parser: %s not declared... fatal error!\n", semanticErrorNum(),lexeme);
 	        syntype = -1;
         } else {
 	        syntype = symtab[varlocality][1];
@@ -564,7 +571,7 @@ int expr(int inherited_type)
 	      if(iscompatible(syntype, acctype)) {
 	         acctype = max(acctype,syntype);
 	      } else {
-	         fprintf(stderr, "incompatible unary operator: fatal error.\n");
+	         fprintf(stderr, "%d: incompatible unary operator: fatal error.\n", semanticErrorNum());
 	      }
 	      /*]]*/
 
@@ -674,7 +681,7 @@ void variable (void)
 {
   /* symbol must be declared */
   if(symtab_lookup(lexeme) == -1) {
-    fprintf(stderr,"FATAL ERROR: symbol not find #:%d",-1);
+    fprintf(stderr,"%d: FATAL ERROR: symbol not find #:%d", semanticErrorNum(), -1);
     return;
     //exit(-1);
   }
