@@ -1,5 +1,5 @@
-#include <keywords.h>
 #include <string.h>
+#include <keywords.h>
 
 char *keywords[] = {
   "begin",

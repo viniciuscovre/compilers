@@ -15,7 +15,7 @@
 *
 * Thus, the calculator language becomes:
 *
-* expr -> term rest
+* smpexpr -> term rest
 *
 * rest -> addop term rest | <>
 *
@@ -23,7 +23,7 @@
 *
 * quoc -> mulop fact quoc | <>
 *
-* fact -> variable | constant | ( expr )
+* fact -> variable | constant | ( smpexpr )
 *
 * addop -> + | -
 *
@@ -35,7 +35,7 @@
 */
 
 /* system include */
-// #include <malloc.h>
+#include <malloc.h> 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,8 +51,6 @@
 #include <parser.h>
 
 int ERROR_COUNTER = 0; // semantic errors counter
-int flag_int = 0;
-int flag_dbl = 0;
 
 char **namelist(void);
 /*
@@ -140,8 +138,6 @@ void declarative(void)
       for(i=0; namev[i]; i++) {
         if(symtab_append(namev[i], type) == -2)
           fprintf(stderr,"%d: FATAL ERROR: -2 no more space in symtab", semanticErrorNum());
-        else if (symtab_append(namev[i], type) == -3)
-	{}// $$$ fprintf(stderr,"%d: FATAL ERROR: -3,%s name does not exist in symtab", semanticErrorNum(), namev[i]);
       }
       /*]]*/
       match(';');
@@ -271,7 +267,7 @@ void stmt(void)
       repeatstmt();
       break;
 
-    /*hereafter we expect FIRST(expr):*/
+    /*hereafter we expect FIRST(smpexpr):*/
     case ID: //tokens.h
     case FLTCONST: //tokens.h
     case INTCONST: //tokens.h
@@ -280,7 +276,7 @@ void stmt(void)
     case NOT: //keywords.h
     case '-':
     case '(':
-      expr(0);
+      smpexpr(0);
       break;
 
     default:
@@ -301,14 +297,14 @@ void beginblock(void)
   match(END);
 }
 
-//ifstmt -> IF superexpr THEN stmt [ ELSE stmt ] | other
+//ifstmt -> IF expr THEN stmt [ ELSE stmt ] | other
 void ifstmt(void)
 {
   /*[[*/int _endif, _else;/*]]*/
   // int syntype;
   match(IF);
-  superexpr(BOOLEAN);
-  // syntype = superexpr(BOOLEAN); //-> <superexpr>asm
+  expr(BOOLEAN);
+  // syntype = expr(BOOLEAN); //-> <expr>asm
   /**//**/
   fprintf(object, "\tjz .L%d\n", _endif = _else = labelcounter++);
   //TODO: verif se o tipo sintetizado é compatível com o tipo herdado
@@ -325,7 +321,7 @@ void ifstmt(void)
 
 }
 
-//whilestmt -> WHILE expr DO stmt
+//whilestmt -> WHILE smpexpr DO stmt
 void whilestmt(void)
 {
   /*[[*/int while_head, while_tail/*]]*/;
@@ -334,7 +330,7 @@ void whilestmt(void)
 
   /*[[*/mklabel(while_head = labelcounter++)/*]]*/;
 
-  superexpr(BOOLEAN);
+  expr(BOOLEAN);
 
   /*[[*/gofalse(while_tail = labelcounter++)/*]]*/;
 
@@ -347,7 +343,7 @@ void whilestmt(void)
 
 }
 
-//repeatstmt -> REPEAT stmt { ; stmt } UNTIL expr
+//repeatstmt -> REPEAT stmt { ; stmt } UNTIL smpexpr
 void repeatstmt(void)
 {
   match(REPEAT);
@@ -357,11 +353,11 @@ void repeatstmt(void)
     stmt();
   }
   match(UNTIL);
-  superexpr(BOOLEAN);
+  expr(BOOLEAN);
 }
 
-/* expr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
-/* expr -> ['-'] term { addop term } */ //como ta na do eraldo
+/* smpexpr -> term { addop [[<enter>]] term [[ print addop.pf ]] } */
+/* smpexpr -> ['-'] term { addop term } */ //como ta na do eraldo
 /*
  * regras de checagem de tipos (e de herança de tipos)...
  *
@@ -453,21 +449,22 @@ int isrelop(void)
   return 0;
 }
 
-/* syntax: superexpr -> expr [ relop expr ] */
-int superexpr(int inherited_type)
+/* syntax: expr -> smpexpr [ relop smpexpr ] */
+int expr(int inherited_type)
 {
-  int t1, t2;
-  t1 = expr(inherited_type); // t1 is for the right side of the expression
+  int t1;
+  t1 = smpexpr(inherited_type); // t1 is for the right side of the smpexpression
   if(isrelop()) { // verifies only when it comes a relational operator
-    t2 = expr(t1);
+    int t2 = smpexpr(t1);
     if(iscompatible(t1,t2)) {
        fprintf(stderr, "%d: incompatible operation %d with %d: fatal error.\n",semanticErrorNum(),t1,t2);
     }
+    return t2;
   }
-  return min(BOOLEAN, t2);
+  return t1;
 }
 
-int expr(int inherited_type)
+int smpexpr(int inherited_type)
 {
   /*[[*/int
 	varlocality,             // position of a variable in symtab
@@ -503,7 +500,6 @@ int expr(int inherited_type)
       case ID:
         /*[[*/
         varlocality = symtab_lookup(lexeme);
-	printf("lexeme:%s\n",lexeme);
         if(varlocality < 0) {
           fprintf(stderr, "%d: parser: %s not declared... fatal error!\n", semanticErrorNum(),lexeme);
 	        syntype = -1;
@@ -520,7 +516,7 @@ int expr(int inherited_type)
 	        /*]]*/
           match(ASGN);
           //verify if rtype changes symbol type...
-	        /*[[*/ rtype = /*]]*/ superexpr(/*[[*/ltype/*]]*/);
+	        /*[[*/ rtype = /*]]*/ expr(/*[[*/ltype/*]]*/);
 
       	  /*[[*/
       	  if(iscompatible(ltype, rtype)) {
@@ -529,16 +525,6 @@ int expr(int inherited_type)
       	    acctype = -1;
       	  }
       	  /*]]*/
-	  /* $$$ // AQUI TEM UM lmovel
-	  char var_name[255];
-	  int c = symtab[varlocality][0];
-	  while(symtab_stream[c]!='\0')
-	  {
-	    var_name[c]=symtab_stream[c];
-	    c++;
-	  }
-	  lmovel(var_name); $$$ */
-
 	      } /*[[*/ else if(varlocality > -1) {
           fprintf(object, "\tpushl %%eax\n\tmovl %s,%%eax\n",
             symtab_stream + symtab[varlocality][0]);
@@ -565,7 +551,7 @@ int expr(int inherited_type)
 
       default:
         match('(');
-	/*[[*/syntype = /*]]*/ superexpr(0);
+	/*[[*/syntype = /*]]*/ expr(0);
 
 	      /*[[*/
 	      if(iscompatible(syntype, acctype)) {
@@ -574,7 +560,6 @@ int expr(int inherited_type)
 	         fprintf(stderr, "%d: incompatible unary operator: fatal error.\n", semanticErrorNum());
 	      }
 	      /*]]*/
-
         match(')');
     }
 
@@ -582,21 +567,17 @@ int expr(int inherited_type)
       goto F_entry;
     if(addop())
       goto T_entry;
-    /* expression ends down here */
+    /* smpexpression ends down here */
 
     /*[[*/
     if(lvalue_seen && varlocality > -1) {
       switch(ltype) {
         // verify which kind of instructions will be worked
         case INTEGER: case REAL: case BOOLEAN:
-	  /* $$$ flag_int = 1;
-	  flag_dbl = 0; $$$ */
           lmovel(symtab_stream + symtab[varlocality][0]); // when 32-bit operation
           break;
 
         case DOUBLE:
-	  /* $$$ flag_int = 0;
-	  flag_dbl = 1; $$$*/
           lmoveq(symtab_stream + symtab[varlocality][0]); // when 64-bit operation
           break;
 
@@ -616,17 +597,7 @@ int addop (void)
   {
     case '+':
       match('+');
-
-      /* $$$ if(flag_int)
-      {*/
       addint();
-      /*printf("PASSOU AQUI INT\n");
-      }
-      else
-      {
-      adddbl();
-      printf("PASSOU AQUI DBL\n");
-      }	 $$$ */
       return '+';
 
     case '-':
@@ -636,6 +607,7 @@ int addop (void)
 
     case OR:
       match(OR);
+      mullog();
       return OR;
   }
   return 0;
@@ -658,6 +630,7 @@ int mulop (void)
 
     case AND:
       match(AND);
+      addlog();
       return AND;
   }
   return 0;
@@ -683,7 +656,6 @@ void variable (void)
   if(symtab_lookup(lexeme) == -1) {
     fprintf(stderr,"%d: FATAL ERROR: symbol not find #:%d", semanticErrorNum(), -1);
     return;
-    //exit(-1);
   }
 
   /*[[*/char varname[MAXID_SIZE]/*]]*/;
@@ -691,43 +663,8 @@ void variable (void)
   match(ID);
   if (lookahead == ASGN) {// L-VALUE:
     match(ASGN); // ASGN = ':='
-    expr(INTCONST);
-    // /*[[*/store(varname)/*]]*/;
-  } else { // R-VALUE:
-    // /*[[*/recall(varname)/*]]*/;
+    smpexpr(INTCONST);
   }
-}
-
-int octalToInt(char octalToConvert[])
-{
-
-  int n = atoi(octalToConvert);
-  int octal = 0, i = 0, rem;
-  while (n!=0)
-  {
-    rem = n%10;
-    n/=10;
-    octal += rem*pow(8,i);
-    ++i;
-  }
-  return octal;
-}
-
-int hexToInt(char hexToConvert[])
-{
-  int j;
-  int len = strlen(hexToConvert);
-  char aux[len-2];
-
-  for(j = 2; j < len; j++) //removing 2 prefixes (0x) of hexadecimal
-  {
-    aux[j-2] = hexToConvert[j];
-  }
-  aux[(len-2)-1] = 0; //closing string with '/0'
-
-
-  int hex = (int)strtol(aux, NULL, 16); //hex --> decimal
-  return hex;
 }
 
 /******************************* lexer-to-parser interface *****************************************/

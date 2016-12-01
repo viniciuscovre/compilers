@@ -11,8 +11,6 @@ FILE *source, *object;
 
 int main (int argc, char *argv[], char *envp[])
 {
-  //object = fopen("arquivo.s", "ab+");
-
   if (argc == 1) {
     fprintf(stderr, "%s: cannot compile without an input file... exiting\n", argv[0]);
     exit (FILE_NOT_FOUND);
@@ -61,7 +59,7 @@ int main (int argc, char *argv[], char *envp[])
     }
   }
   mypas();
-  print_symtab_stream();
+  //print_symtab_stream(); //this is a function for debug purposes, prints the entire symtab_stream
   printf("\n");
   exit (END_OF_COMPILATION);
 }

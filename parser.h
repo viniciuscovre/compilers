@@ -17,7 +17,7 @@
  *
  * Thus, the calculator language becomes:
  *
- * expr -> term rest
+ * smpexpr -> term rest
  *
  * rest -> addop term rest | <>
  *
@@ -25,7 +25,7 @@
  *
  * quoc -> mulop fact quoc | <>
  *
- * fact -> variable | constant | ( expr )
+ * fact -> variable | constant | ( smpexpr )
  *
  * addop -> + | -
  *
@@ -40,16 +40,16 @@
  #define MAXSTACK_SIZE     0x40
  #define MAX_ARG_NUM 1024
 
-/* expr -> term rest */
+/* smpexpr -> term rest */
+int smpexpr(int inherited_type);
 int expr(int inherited_type);
-int superexpr(int inherited_type);
 /* term -> fact quoc */
 void term (void);
 /* rest -> addop term rest | <> */
 void rest (void);
 /* quoc -> mulop fact quoc | <> */
 void quoc(void);
-/* fact -> variable | constant | ( expr ) */
+/* fact -> variable | constant | ( smpexpr ) */
 void fact (void);
 /* addop -> + | - */
 int addop (void);
@@ -77,8 +77,8 @@ void beginblock(void);
 void ifstmt(void);
 void whilestmt(void);
 void repeatstmt(void);
-int octalToInt(char octalToConvert[]);
-int hexToInt(char hexToConvert[]);
+/*int octalToInt(char octalToConvert[]);
+int hexToInt(char hexToConvert[]);*/
 
 /******************************* lexer-to-parser interface *****************************************/
 

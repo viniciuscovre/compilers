@@ -57,39 +57,50 @@ int rmoveq (char const *variable) // copy of 64 bits
 
 int neglog(void)
 {
+  fprintf(object, "\tnot %%eax\n");
   return 0;
 }
 
 int negint(void)
 {
-return 0;
+  fprintf(object, "\tnot %%eax\n");
+  return 0;
 }
 
 int negflt(void)
 {
- 
+  fprintf(object, "\taddss %%xmm1, %%xmm0\n");
+  fprintf(object, "\tmovss %%xmm0, x(%%rip)\n");
+  fprintf(object, "\tnot %%esp\n");
   return 0;
 }
 
 int negdbl(void)
 {
+  fprintf(object, "\taddsd %%xmm1, %%xmm0\n");
+  fprintf(object, "\tmovsd %%xmm0, x(%%rip)\n");
+  fprintf(object, "\tnot %%esp\n");
   return 0;
 }
 
 /*binary addition and inversion*/
 
+/*dbl and flt functions expects the value in the last label
+then move the value from the label to register
+then apply operation (value on register with value on top of stack)
+
+  int functions expects value in register then just apply operation
+*/
+
 int addlog(void)
 {
-
-return 0;
+  fprintf(object, "\tor %%eax, (%%esp)\n");
+  fprintf(object, "\tpopl %%eax\n");
+  return 0;
 }
 
 int addint(void)
 {
-/*
-  addl %eax, (%rsp)
-  popl %eax
- */
  fprintf(object, "\taddl %%eax, (%%esp)\n");
  fprintf(object, "\tpopl %%eax\n");
  return 0;
@@ -97,14 +108,15 @@ int addint(void)
 
 int addflt(void)
 {
+  fprintf(object, "\tmovss .LC%d(%%rip), %%xmm0\n",labelcounter);
   fprintf(object, "\taddss %%xmm1, %%xmm0\n");
-  fprintf(object, "\tmovss %%xmm0, x(%%rip)\n");
-  fprintf(object, "\taddl $4, %%esp\n");
   return 0;
 }
 
 int adddbl(void)
 {
+  fprintf(object, "\tmovsd .LC%d(%%rip), %%xmm0\n",labelcounter);
+  fprintf(object, "\tmulss %%rbp, %%xmm0\n"); 
   return 0;
 }
 
@@ -118,12 +130,15 @@ int subint(void)
 
 int subflt(void)
 {
+ fprintf(object, "\tmovss .LC%d(%%rip), %%xmm0\n",labelcounter);
+ fprintf(object, "\tsubss %%rbp, %%xmm0\n");
   return 0;
 }
 
 int subdbl(void)
 {
-  
+ fprintf(object, "\tmovsd .LC%d(%%rip), %%xmm0\n",labelcounter);
+ fprintf(object, "\tsubsd %%rbp, %%xmm0\n"); 
   return 0;
 }
 
@@ -131,6 +146,8 @@ int subdbl(void)
 
 int mullog(void)
 {
+  fprintf(object, "\tand %%eax, (%%esp)\n");
+  fprintf(object, "\tpopl %%eax\n");
   return 0;
 }
 
@@ -142,29 +159,36 @@ int mulint(void)
 }
 
 int mulflt(void)
-{
+{	
+  fprintf(object, "\tmovss .LC%d(%%rip), %%xmm0\n",labelcounter);
+  fprintf(object, "\tmulss %%rbp), %%xmm0\n");
   return 0;
 }
 
 int muldbl(void)
 {
+ fprintf(object, "\tmovsd .LC%d(%%rip), %%xmm0\n",labelcounter);
+ fprintf(object, "\tmulsd %%rbp, %%xmm0\n");
   return 0;
 }
 
 int divint(void)
 {
+ fprintf(object, "\tcltd\n");
+ fprintf(object, "\tidivl %%esp\n");
   return 0;
 }
 
 int divflt(void)
 {
- fprintf(object, "\tcltd\n");
- fprintf(object, "\tidivl %%esp\n");
- fprintf(object, "\tmovl %%esp,%%eax,\n");
+  fprintf(object, "\tmovss .LC%d(%%rip), %%xmm0\n",labelcounter);
+  fprintf(object, "\tdivss %%rbp, %%xmm0;\n");
   return 0;
 }
 
 int divdbl(void)
 {
+  fprintf(object, "\tmovsd .LC%d(%%rip), %%xmm0\n",labelcounter);
+  fprintf(object, "\tdivss %%rbp), %%xmm0;\n");
   return 0;
 }
