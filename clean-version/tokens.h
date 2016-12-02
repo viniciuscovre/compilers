@@ -1,8 +1,8 @@
-/**@<tokens.h>::**/
-
 enum {
 	ID = 1025,
 	INTCONST,
+	OCTAL,
+	HEX,
 	FLTCONST,
 	DBLCONST,
 	ASGN,
@@ -20,4 +20,13 @@ enum {
 
 enum {
 	EOL = 10, //END OF LINE
+};
+
+enum {
+	END_OF_COMPILATION = 0,
+	FILE_NOT_FOUND = -1,
+	INCOMPATIBLE_FILE_EXTENSION = -2,
+	EMPTY_FILE_EXTENSION = -3,
+	INCOMPATIBLE_PARAMETER = -4,
+	PARAMETERS_SURPLUS = -5,
 };

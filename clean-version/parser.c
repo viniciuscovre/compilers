@@ -5,12 +5,10 @@
 #include <math.h>
 /* local include */
 #include <tokens.h>
-#include <parser.h>
 #include <lexer.h>
 #include <keywords.h>
 #include <mypas.h>
-
-#define MAX_ARG_NUM 1024
+#include <parser.h>
 
 void namelist(void);
 
@@ -86,46 +84,6 @@ void declarative(void)
   }
 }
 
-// fnctype -> INTEGER | REAL | BOOLEAN
-void fnctype(void)
-{
-  switch(lookahead) {
-    case INTEGER:
-      match(INTEGER);
-      break;
-
-    case REAL:
-      match(REAL);
-      break;
-
-    default:
-      match(BOOLEAN);
-  }
-}
-
-// parmdef -> [ '(' [VAR] namelist ':' { ';' [VAR] namelist ':' vartype } ')' ]
-void parmdef(void)
-{
-  if(lookahead == '(') {
-    match('(');
-    if(lookahead == VAR){
-      match(VAR);
-    }
-    namelist();
-    match(':');
-    while(lookahead == ';') {
-      match(';');
-      if(lookahead == VAR) {
-        match(VAR);
-      }
-      namelist();
-      match(':');
-      vartype();
-    }
-  }
-  match(')');
-}
-
 //namelist -> ID { , ID }
 void namelist(void)
 {
@@ -157,6 +115,7 @@ int vartype(void)
 // imperative BEGIN stmtlist END
 void imperative(void)
 {
+  printf("lookahead: %d", lookahead);
   match(BEGIN);
   stmtlist();
   match(END);
@@ -407,19 +366,6 @@ int mulop (void)
   return 0;
 }
 
-/* arithmetic_op -> > | < */
-int arithmetic_op (void)
-{
-  switch (lookahead)
-  {
-    case '>':
-    match('>'); return '>';
-    case '<':
-    match('<'); return '<';
-  }
-  return 0;
-}
-
 /* variable -> [[ print ID ]] ID */
 void variable (void)
 {
@@ -440,7 +386,7 @@ extern int gettoken (FILE *); /** @ lexer **/
 void match (int expected_token)
 {
   if (expected_token == lookahead) {
-    lookahead = gettoken (source_code);
+    lookahead = gettoken (source);
   } else {
     fprintf (stderr, "\nparser: token mismatch error.\n");
     fprintf (stderr, "expecting %d but seen %d. Exting...\n",

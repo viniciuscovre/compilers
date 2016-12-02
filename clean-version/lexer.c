@@ -1,10 +1,10 @@
-/**@<lexer.c>::**/
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include <tokens.h>
+#include <keywords.h>
 #include <lexer.h>
-#include <keywords.c>
 
 void skipspaces (FILE *tape)
 {
@@ -14,8 +14,9 @@ void skipspaces (FILE *tape)
   ungetc ( cake, tape );
 }
 
-char lexeme[MAXID_SIZE+1];//@ lexer.c
+char lexeme[MAXID_SIZE+1];
 
+// ASGN = :=
 int is_assign(FILE * tape){
 
   if((lexeme[0] = getc(tape)) == ':'){
@@ -82,6 +83,59 @@ int is_decimal(FILE *tape)
   return 0;
 }
 
+// OCTAL =  0[1-7][0-7]*
+int is_octal(FILE *tape)
+{
+  int i = 0;
+  lexeme[i] = getc(tape);
+  if (lexeme[i] == '0') {
+    lexeme[++i] = getc(tape);
+    if ( lexeme[i] >= '1' && lexeme[i] <= '7') {
+      while ( (lexeme[++i] = getc(tape)) >= '0' && lexeme[i] <= '7');
+      ungetc (lexeme[i], tape);
+      return OCTAL;
+    } else {
+      ungetc (lexeme[i], tape);
+      ungetc (lexeme[i-1], tape);
+      return 0;
+    }
+  }
+  ungetc (lexeme[i], tape);
+  return 0;
+}
+
+// HEX = 0[xX][0-9a-fA-F]+
+int is_hexadecimal(FILE *tape)
+{
+  int i = 0;
+  lexeme[i] = getc(tape);
+  if (lexeme[i] == '0') {
+    if ( tolower((lexeme[++i] = getc(tape))) == 'x'){
+      lexeme[++i] = getc(tape);
+      if ( isdigit(lexeme[i]) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') ) {
+        while ( isdigit((lexeme[++i] = getc(tape))) || (tolower(lexeme[i]) >= 'a' && tolower(lexeme[i]) <= 'f') );
+        ungetc(lexeme[i],tape);
+        return HEX;
+
+      } else {
+        ungetc(lexeme[i],tape);
+        ungetc(lexeme[i-1],tape);
+        ungetc(lexeme[i-2],tape);
+        return 0;
+      }
+
+    } else{
+      ungetc(lexeme[i],tape);
+      ungetc(lexeme[i-1],tape);
+      return 0;
+    }
+
+  } else {
+    ungetc(lexeme[i],tape);
+  }
+  return 0;
+}
+
 /* FLOAT = ( DEC ‘.’ DIGIT* | ‘.’ DIGIT+ ) EXP? | DEC EXP
 
 DIGIT = [0-9]
@@ -89,7 +143,7 @@ EXP =  ('E'|'e') (‘+’|‘-’)? DIGIT+  */
 int is_float(FILE *tape) {
 
   int i;
-  if (is_decimal(tape)) { //inicia com dec
+  if (is_decimal(tape)) { // begins as decimal
 
     i = strlen(lexeme);
     lexeme[i] = getc(tape);
@@ -155,6 +209,12 @@ int gettoken (FILE *tokenstream)
   if (token) return token;
 
   token = is_float(tokenstream);
+  if (token) return token;
+
+  token = is_octal(tokenstream);
+  if (token) return token;
+
+  token = is_hexadecimal (tokenstream);
   if (token) return token;
 
   token = getc (tokenstream);
