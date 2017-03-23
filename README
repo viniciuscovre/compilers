@@ -1,18 +1,4 @@
-TODO:
+# Compilers
+A course in Compilers given by Eraldo Marinho at Unesp, Rio Claro.
 
-- No compilador, comando é uma sentença(todo comando é uma sentença, nem toda
-sentença é um comando) // em keywords.[ch]
-//ERALDO: O TERMO "COMANDOS" É ERRADO!
-
-- preencher pseudoassembly.c FEITO BOA PARTE, FALTAM COISAS (revisar o pseudo
-assembly feito em sala, modificar a parte dos double onde diz
-VAR1_parteAlta/baixa,e mais uns)
-
-- encaixar as chamadas de funcoes do pseudoassembly!!!
-
-- no fim da compilação, deve-se apenas exibir uma lista com erros semânticos OU
-o erro sintático q força o exit
-
-- verificar iscompatible();
-
-http://primepuzzle.com/tp2/syntax-diagrams.html
+Computer Science bachelor's degree, 2016.
